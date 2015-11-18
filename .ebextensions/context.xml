@@ -21,6 +21,6 @@
          -->
     <Manager className="com.amazonaws.services.dynamodb.sessionmanager.DynamoDBSessionManager"
              awsAccessKey="AKIAI4RIREUPRIBGE7DQ"
-             awsSecretKey="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"
+             awsSecretKey="XXXXX"
              createIfNotExist="true" />
 </Context>

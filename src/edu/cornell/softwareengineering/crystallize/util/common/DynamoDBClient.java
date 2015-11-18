@@ -41,7 +41,8 @@ public class DynamoDBClient {
 	}
 	
     public static void addTable(String tableName) throws Exception {
-        try {
+    	if(dynamoClient == null) getDynamoClient();
+    	try {
             // Create table if it does not exist yet
             if (Tables.doesTableExist(dynamoClient, tableName)) {
                 System.out.println("Table " + tableName + " is already ACTIVE");

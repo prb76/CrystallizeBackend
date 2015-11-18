@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import edu.cornell.softwareengineering.crystallize.util.Insert;
+import edu.cornell.softwareengineering.crystallize.util.common.DynamoDBClient;
 import edu.cornell.softwareengineering.crystallize.util.common.ParameterParser;
 
 /**
@@ -33,6 +34,8 @@ public class InsertServlet extends HttpServlet {
 
 			JSONObject refinedParams = refineParameters(parameters);
 			out.append(refinedParams.toString() + "\n");
+			
+			DynamoDBClient.addTable(refinedParams.getString("table"));
 			
 			String result = Insert.insert(refinedParams);	
 			out.append(result);
