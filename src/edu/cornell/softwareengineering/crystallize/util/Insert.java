@@ -31,7 +31,7 @@ public class Insert {
 
 		
 		
-		PutItemOutcome result = table.putItem(item);
+		PutItemOutcome result = table.updateItem(item);
 		
     	return result.toString();
 	}

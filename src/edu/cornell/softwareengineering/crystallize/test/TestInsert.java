@@ -25,8 +25,7 @@ public class TestInsert {
 	
 	public static void basicTest() throws JSONException, IOException {
 		JSONObject document = new JSONObject();
-		document.put("name", "ravi");
-		document.put("grade", "A+");
+		document.put("grade", "B-");
 		System.out.println(document.toString());
 		
 		JSONObject parameters = new JSONObject();
