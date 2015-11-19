@@ -1,5 +1,25 @@
-Icons Copyright (c) Yusuke Kamiyamane.
-Licensed under a Creative Commons Attribution 3.0 license.
+------------
+Backend APIs
+------------
 
-http://p.yusukekamiyamane.com
-http://creativecommons.org/licenses/by/3.0/
+/DictionaryQuery
+Request params: text(current word to be queried)
+Response: Word object which consists of japanese translation and some metadata
+
+/InsertPhrase
+Request params: List of word objects
+Response: Success or failure
+
+--------
+Frontend
+--------
+
+The frontend consists of 1 textbox that takes either English or Romanized text as input.
+The current word is sent to the backend, which returns a list of word objects that match 
+the current word. The user selects from the options and the selected word is added to a 
+running list of words to be returned.
+
+If a user uses backspace, the last japanese word in the text box is deleted and the word object
+is removed from the list of words to be returned.
+
+On submit, the list of word objects is sent to the backend.
