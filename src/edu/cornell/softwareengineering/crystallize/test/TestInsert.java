@@ -21,14 +21,11 @@ public class TestInsert {
 
 	public static void main(String[] args) throws JSONException, IOException {		
 		basicTest();
-		
-		//playerTest("./src/edu/cornell/softwareengineering/crystallize/test/SimpleSheep.json");
-		//playerTest("./src/edu/cornell/softwareengineering/crystallize/test/ConcernedSheep.json");
 	}
 	
 	public static void basicTest() throws JSONException, IOException {
 		JSONObject document = new JSONObject();
-		document.put("name", "peter");
+		document.put("name", "ravi");
 		document.put("grade", "A+");
 		System.out.println(document.toString());
 		

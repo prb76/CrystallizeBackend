@@ -35,7 +35,7 @@ public class InsertServlet extends HttpServlet {
 			JSONObject refinedParams = refineParameters(parameters);
 			out.append(refinedParams.toString() + "\n");
 			
-			DynamoDBClient.addTable(refinedParams.getString("table"));
+			//DynamoDBClient.addTable(refinedParams.getString("table"));
 			
 			String result = Insert.insert(refinedParams);	
 			out.append(result);
