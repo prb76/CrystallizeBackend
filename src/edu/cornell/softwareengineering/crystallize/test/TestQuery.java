@@ -12,8 +12,7 @@ public class TestQuery {
 	final static String queryURL = "http://localhost:8080/CrystallizeDynamoBackend/Query";
 	
 	public static void main(String[] args) throws JSONException, IOException {
-		//basicTest();
-		System.out.println(ComparisonOperator.EQ);
+		basicTest();
 		//nestDocTest();
 	}
 	

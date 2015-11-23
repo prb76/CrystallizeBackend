@@ -95,6 +95,7 @@ public class TestInsert {
 
 		    while (line != null) {
 		        sb.append(line);
+		        System.out.println(line);
 		        sb.append(System.lineSeparator());
 		        line = br.readLine();
 		    }
@@ -102,28 +103,34 @@ public class TestInsert {
 		    System.out.println(JSONObject.getNames(obj));
 		    JSONObject JMdict = obj.getJSONObject("JMdict");
 		    JSONArray entries = JMdict.getJSONArray("entry");
-		    for(int i = 0; i < entries.length(); i++) {
+		    for(int i = 0; i < 5; i++) {
 		    	JSONObject entry = entries.getJSONObject(i);
-		    	String kanji = entry.getString("k_ele");
-		    	String kana = entry.getString("r_ele");
+		    	
+		    	System.out.println(entry.toString());
+		    	
 		    	String englishStr = "";
-		    	JSONArray englishTranslations = entry.getJSONObject("sense").getJSONArray("gloss");
-		    	for(int j = 0; j < englishTranslations.length(); j++){
-		    		englishStr += englishTranslations.getString(j) + ", ";
-		    	}
+		    	JSONObject englishTranslations = entry.getJSONObject("sense").getJSONObject("gloss");
+//		    	for(int j = 0; j < englishTranslations.length(); j++){
+//		    		englishStr += englishTranslations.getString(j) + ", ";
+//		    	}
 		    	
 		    	//Store item
 		    	JSONObject parameters = new JSONObject();
 				parameters.append("table", "Dictionary");
-				parameters.append("Kanji", kanji);
-				parameters.append("Kana", kana);
+		    	if(entry.has("k_ele")) {
+		    		JSONObject kanji = entry.getJSONObject("k_ele");
+					parameters.append("Kanji", kanji);
+		    	}
+		    	if(entry.has("r_ele")) {
+		    		JSONObject kana = entry.getJSONObject("r_ele");
+					parameters.append("Kana", kana);
+		    	}
+				parameters.append("English", englishTranslations);
 				//FIX THIS
 				System.out.println(parameters.toString());
 				
 			    HTTPConnection.excutePost(insertURL, parameters.toString());
 		    }
-			
-			
 		} finally {
 		    br.close();
 		}

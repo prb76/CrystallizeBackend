@@ -2,6 +2,8 @@ package edu.cornell.softwareengineering.crystallize.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,6 +65,8 @@ public class Query {
 		
 		ScanResult result = dynamoDB.scan(request);
 		
+		List<Map<String, AttributeValue>> items = result.getItems();
+		
     	return result.toString();
 	}
 	
@@ -92,7 +96,6 @@ public class Query {
 			expression += ")";
 		}
 		
-
 		request
 			.withFilterExpression(expression)
 			.withExpressionAttributeValues(valueMap);
@@ -102,38 +105,37 @@ public class Query {
 	
 	private static String getExpression(String attribute, String value, String operator) {
 		//General Operators
-		if (operator == ComparisonOperator.EQ.toString()) 
+		if (operator.equals(ComparisonOperator.EQ.toString())) 
 			return "(" + attribute + " = " + value + ")";
-		else if (operator == ComparisonOperator.NE.toString()) 
+		else if (operator.equals(ComparisonOperator.NE.toString()))
 			return "(" + attribute + " <> " + value + ")";
 		
 		//Number Operators
-		else if (operator == ComparisonOperator.LT.toString()) 
+		else if (operator.equals(ComparisonOperator.LT.toString())) 
 			return "(" + attribute + " < " + value + ")";
-		else if (operator == ComparisonOperator.LE.toString()) 
+		else if (operator.equals(ComparisonOperator.LE.toString()))
 			return "(" + attribute + " <= " + value + ")";
-		else if (operator == ComparisonOperator.GT.toString()) 
+		else if (operator.equals(ComparisonOperator.GT.toString()))
 			return "(" + attribute + " >= " + value + ")";
-		else if (operator == ComparisonOperator.GE.toString()) 
+		else if (operator.equals(ComparisonOperator.GE.toString()))
 			return "(" + attribute + " > " + value + ")";
 		
 		//String Operators
-		else if (operator == ComparisonOperator.BEGINS_WITH.toString())
+		else if (operator.equals(ComparisonOperator.BEGINS_WITH.toString()))
 			return "(begins_with(" + attribute + ", " + value + "))";
-		else if (operator == ComparisonOperator.NOT_NULL.toString())
+		else if (operator.equals(ComparisonOperator.NOT_NULL.toString()))
 			return "(attribute_exists(" + attribute + "))";
-		else if (operator == ComparisonOperator.NULL.toString())
+		else if (operator.equals(ComparisonOperator.NULL.toString()))
 			return "(attribute_not_exists(" + attribute + "))";
 		
 		//String & Set Operators
-		else if (operator == ComparisonOperator.CONTAINS.toString())
+		else if (operator.equals(ComparisonOperator.CONTAINS.toString()))
 			return "(contains(" + attribute + ", " + value + "))";
 
 		//List Operators
-		else if (operator == ComparisonOperator.IN.toString())
+		else if (operator.equals(ComparisonOperator.IN.toString()))
 			return "(" + value + " IN " + attribute + ")";
 		
 		else return "";
-		
 	}
 }
