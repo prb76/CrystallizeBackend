@@ -25,13 +25,10 @@ public class Insert {
 		Item item = new Item()
 			.withPrimaryKey("ID", ID)
 			.withJSON("document", document.toString());
-			//.withJSON("document", document.toString());
 		
 		Table table = DynamoDBClient.getTable(tableName);
-
 		
-		
-		PutItemOutcome result = table.updateItem(item);
+		PutItemOutcome result = table.putItem(item);
 		
     	return result.toString();
 	}
