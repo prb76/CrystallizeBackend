@@ -18,9 +18,11 @@ public class TestQuery {
 	
 	public static void basicTest() throws JSONException, IOException {
 		JSONObject queryItem = new JSONObject();
-		queryItem.put("attribute", "ID");
-		queryItem.put("operator", "EQ");
-		queryItem.put("values", new JSONArray().put("123"));
+		queryItem.put("attribute", "document.grade");
+		queryItem.put("operator", "CONTAINS");
+		queryItem.put("values", new JSONArray().put("A").put("B"));
+		
+		
 		
 		JSONObject parameters = new JSONObject();
 		parameters.append("table", "Test");

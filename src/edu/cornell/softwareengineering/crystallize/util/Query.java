@@ -12,7 +12,6 @@ import org.json.JSONObject;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
-import com.amazonaws.services.dynamodbv2.model.Condition;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
 
@@ -57,8 +56,6 @@ public class Query {
 			attributesList.add(filters.getString(i));
 		}
 		
-		HashMap<String, AttributeValue> x = new HashMap<String, AttributeValue>();
-		x.put(":grade", new AttributeValue().withS("B"));
 		ScanRequest request = getScanRequest(tableName, query);
 		
 		if(!attributesList.isEmpty()) request.withAttributesToGet(attributesList);
@@ -67,7 +64,11 @@ public class Query {
 		
 		List<Map<String, AttributeValue>> items = result.getItems();
 		
-    	return result.toString();
+		JSONObject resultJSON = new JSONObject();
+		resultJSON.put("ok", true);
+		resultJSON.put("results", items);
+		
+    	return resultJSON.toString();
 	}
 	
 	private static ScanRequest getScanRequest(String tableName, JSONArray query) throws JSONException {
@@ -75,6 +76,7 @@ public class Query {
 		
 		HashMap<String, AttributeValue> valueMap = new HashMap<String, AttributeValue>();
 		String expression = "";
+		int valueKeyID = 0;
 		
 		for(int i = 0; i < query.length(); i++) {
 			if(expression != "") expression += " AND ";
@@ -86,12 +88,12 @@ public class Query {
 			
 			expression += "(";
 			for(int valueIndex = 0; valueIndex < values.length(); valueIndex++) {
+				if(valueIndex > 0) expression += " OR ";
 				String value = values.getString(valueIndex);
-				String valueKey = ":" + attribute + valueIndex;
+				String valueKey = ":value" + (valueKeyID++);
 				valueMap.put(valueKey, new AttributeValue().withS(value));
 				
 				expression += getExpression(attribute, valueKey, operator);
-				expression += " OR ";
 			}
 			expression += ")";
 		}
@@ -106,35 +108,35 @@ public class Query {
 	private static String getExpression(String attribute, String value, String operator) {
 		//General Operators
 		if (operator.equals(ComparisonOperator.EQ.toString())) 
-			return "(" + attribute + " = " + value + ")";
+			return attribute + " = " + value;
 		else if (operator.equals(ComparisonOperator.NE.toString()))
-			return "(" + attribute + " <> " + value + ")";
+			return attribute + " <> " + value;
 		
 		//Number Operators
 		else if (operator.equals(ComparisonOperator.LT.toString())) 
-			return "(" + attribute + " < " + value + ")";
+			return attribute + " < " + value;
 		else if (operator.equals(ComparisonOperator.LE.toString()))
-			return "(" + attribute + " <= " + value + ")";
+			return attribute + " <= " + value;
 		else if (operator.equals(ComparisonOperator.GT.toString()))
-			return "(" + attribute + " >= " + value + ")";
+			return attribute + " >= " + value;
 		else if (operator.equals(ComparisonOperator.GE.toString()))
-			return "(" + attribute + " > " + value + ")";
+			return attribute + " > " + value;
 		
 		//String Operators
 		else if (operator.equals(ComparisonOperator.BEGINS_WITH.toString()))
-			return "(begins_with(" + attribute + ", " + value + "))";
+			return "begins_with(" + attribute + ", " + value + ")";
 		else if (operator.equals(ComparisonOperator.NOT_NULL.toString()))
-			return "(attribute_exists(" + attribute + "))";
+			return "attribute_exists(" + attribute + ")";
 		else if (operator.equals(ComparisonOperator.NULL.toString()))
-			return "(attribute_not_exists(" + attribute + "))";
+			return "attribute_not_exists(" + attribute + ")";
 		
 		//String & Set Operators
 		else if (operator.equals(ComparisonOperator.CONTAINS.toString()))
-			return "(contains(" + attribute + ", " + value + "))";
+			return "contains(" + attribute + ", " + value + ")";
 
 		//List Operators
 		else if (operator.equals(ComparisonOperator.IN.toString()))
-			return "(" + value + " IN " + attribute + ")";
+			return value + " IN " + attribute;
 		
 		else return "";
 	}

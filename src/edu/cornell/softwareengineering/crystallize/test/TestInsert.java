@@ -20,18 +20,19 @@ public class TestInsert {
 	final static String insertURL = "http://localhost:8080/CrystallizeDynamoBackend/Insert";
 
 	public static void main(String[] args) throws JSONException, IOException {		
-		uploadDictionary();
+		basicTest();
+		//		uploadDictionary();
 	}
 	
 	public static void basicTest() throws JSONException, IOException {
 		JSONObject document = new JSONObject();
-		document.put("grade", "B-");
+		document.put("grade", "A-");
 		System.out.println(document.toString());
 		
 		JSONObject parameters = new JSONObject();
 		parameters.append("document", document.toString());
 		parameters.append("table", "Test");
-		parameters.append("ID", "123");
+		parameters.append("ID", "321");
 		System.out.println(parameters.toString());
 		
 		HTTPConnection.excutePost(insertURL, parameters.toString());
