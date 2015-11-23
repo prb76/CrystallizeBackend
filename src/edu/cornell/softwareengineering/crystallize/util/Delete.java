@@ -3,47 +3,26 @@ package edu.cornell.softwareengineering.crystallize.util;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.WriteResult;
-import com.mongodb.util.JSON;
+import com.amazonaws.services.dynamodbv2.document.DeleteItemOutcome;
+import com.amazonaws.services.dynamodbv2.document.Table;
 
 import edu.cornell.softwareengineering.crystallize.util.common.DynamoDBClient;
 
 public class Delete {
 	public static String delete(JSONObject parameters) throws Exception {
-		String collection;
-		JSONObject query;
-		
+		String tableName;
+		String ID;
 		try {
-			collection = parameters.getString("collection");
-			query = parameters.getJSONObject("query");
+			tableName = parameters.getString("table");
+			ID = parameters.getString("ID");
 		} catch (JSONException e) {
 			throw new Exception("Parameter error inside Insert class");
 		}
 		
-		DBCollection coll = DynamoDBClient.getCollection(collection);
+		Table table = DynamoDBClient.getTable(tableName);
 		
-    	// Deletes objects based on query
-    	DBObject deleteQuery = (DBObject) JSON.parse(query.toString());
-
-    	WriteResult result = coll.remove(deleteQuery);
+		DeleteItemOutcome result = table.deleteItem("ID", ID);
+		
     	return result.toString();
-    	
-    	//return "Successfully deleted object";
 	}
-	
-//	// Converts an HTTP parameter mapping to a DBObject
-//	private static QueryBuilder getParameterObject(Map<String, String[]> parameterMap) {
-//		QueryBuilder parameterObj = new QueryBuilder();
-//		
-//		Iterator parameterIter = parameterMap.entrySet().iterator();
-//		while(parameterIter.hasNext()) {
-//			Map.Entry<String, String[]> pair = (Map.Entry<String, String[]>)parameterIter.next();
-//			String key = pair.getKey();
-//			String[] values = pair.getValue();
-//			parameterObj.put(key).in(values);
-//		}
-//		return parameterObj;
-//	}
 }
