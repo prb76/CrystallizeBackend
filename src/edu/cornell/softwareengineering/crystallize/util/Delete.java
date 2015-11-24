@@ -23,6 +23,10 @@ public class Delete {
 		
 		DeleteItemOutcome result = table.deleteItem("ID", ID);
 		
-    	return result.toString();
+		JSONObject resultJSON = new JSONObject();
+		resultJSON.put("ok", true);
+		resultJSON.put("results", result);
+		
+    	return resultJSON.toString();
 	}
 }

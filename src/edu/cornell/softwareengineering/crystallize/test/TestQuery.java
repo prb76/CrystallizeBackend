@@ -13,6 +13,8 @@ public class TestQuery {
 	
 	public static void main(String[] args) throws JSONException, IOException {
 		basicTest();
+		multiValueSingleFieldTest();
+		multiValueMultiFieldTest();
 		//nestDocTest();
 	}
 	
@@ -20,17 +22,50 @@ public class TestQuery {
 		JSONObject queryItem = new JSONObject();
 		queryItem.put("attribute", "document.grade");
 		queryItem.put("operator", "CONTAINS");
-		queryItem.put("values", new JSONArray().put("A").put("B"));
-		
-		
+		queryItem.put("values", new JSONArray().put("A"));
 		
 		JSONObject parameters = new JSONObject();
-		parameters.append("table", "Test");
+		parameters.put("table", "Test");
 		parameters.append("query", queryItem);
-		System.out.println(parameters.toString());
+//		System.out.println(parameters.toString());
 		
 		HTTPConnection.excutePost(queryURL, parameters.toString());
 	}
+
+	public static void multiValueSingleFieldTest() throws JSONException, IOException {
+		JSONObject queryItem = new JSONObject();
+		queryItem.put("attribute", "document.grade");
+		queryItem.put("operator", "CONTAINS");
+		queryItem.put("values", new JSONArray().put("A").put("B"));
+		
+		JSONObject parameters = new JSONObject();
+		parameters.put("table", "Test");
+		parameters.append("query", queryItem);
+//		System.out.println(parameters.toString());
+		
+		HTTPConnection.excutePost(queryURL, parameters.toString());
+	}
+	
+	public static void multiValueMultiFieldTest() throws JSONException, IOException {
+		JSONObject queryItem = new JSONObject();
+		queryItem.put("attribute", "document.grade");
+		queryItem.put("operator", "CONTAINS");
+		queryItem.put("values", new JSONArray().put("A").put("B"));
+		
+		JSONObject queryItem2 = new JSONObject();
+		queryItem2.put("attribute", "ID");
+		queryItem2.put("operator", "EQ");
+		queryItem2.put("values", new JSONArray().put("123"));
+		
+		JSONObject parameters = new JSONObject();
+		parameters.put("table", "Test");
+		parameters.append("query", queryItem);
+		parameters.append("query", queryItem2);
+//		System.out.println(parameters.toString());
+		
+		HTTPConnection.excutePost(queryURL, parameters.toString());
+	}
+	
 	
 	public static void nestDocTest() throws JSONException, IOException {
 		JSONObject queryItem = new JSONObject();
