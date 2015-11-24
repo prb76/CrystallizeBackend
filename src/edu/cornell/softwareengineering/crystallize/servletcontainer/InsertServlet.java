@@ -29,13 +29,7 @@ public class InsertServlet extends HttpServlet {
 		JSONObject parameters;
 		try {
 			parameters = ParameterParser.getParameterObject(request);
-			out.append(parameters.toString() + "\n");
-
 			JSONObject refinedParams = refineParameters(parameters);
-			out.append(refinedParams.toString() + "\n");
-			
-			//DynamoDBClient.addTable(refinedParams.getString("table"));
-			
 			String result = Insert.insert(refinedParams);	
 			out.append(result);
 			
@@ -55,34 +49,25 @@ public class InsertServlet extends HttpServlet {
 		
 		// check table parameter
 		if(parameters.has("table")) {
-			JSONArray tableArray = parameters.getJSONArray("table");
-			if(tableArray.length() == 1) {
-				refined.put("table", tableArray.getString(0));
-			}
-			else if(tableArray.length() > 1) { throw new Exception("Parameters 'table' has more than one value"); }
-			else { throw new Exception("Parameters 'table' is empty"); }
+			String table = parameters.getString("table");
+			if (!table.equals("")) refined.put("table", table);
+			else { throw new Exception("Parameter 'table' is empty"); }
 		}
 		else { throw new Exception("Parameter 'table' missing"); }
 		
 		// check ID parameter
 		if(parameters.has("ID")) {
-			JSONArray IDArray = parameters.getJSONArray("ID");
-			if(IDArray.length() == 1) {
-				refined.put("ID", IDArray.getString(0));
-			}
-			else if(IDArray.length() > 1) { throw new Exception("Parameters 'ID' has more than one value"); }
-			else { throw new Exception("Parameters 'ID' is empty"); }
+			String ID = parameters.getString("ID");
+			if (!ID.equals("")) refined.put("ID", ID);
+			else { throw new Exception("Parameter 'ID' is empty"); }
 		}
 		else { throw new Exception("Parameter 'ID' missing"); }
 		
 		// check document parameter
 		if(parameters.has("document")) {
-			JSONArray documentArray = parameters.getJSONArray("document");
-			if(documentArray.length() == 1) {
-				refined.put("document", new JSONObject(documentArray.getString(0)));
-			}
-			else if(documentArray.length() > 1) { throw new Exception("Parameters 'ID' has more than one value"); }
-			else { throw new Exception("Parameters 'document' is empty"); }		}
+			JSONObject document = parameters.getJSONObject("document");
+			refined.put("document", document);
+		}
 		else { throw new Exception("Parameter 'document' missing"); }
 		
 		return refined;

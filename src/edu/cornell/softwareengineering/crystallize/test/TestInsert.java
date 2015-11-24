@@ -1,38 +1,30 @@
 package edu.cornell.softwareengineering.crystallize.test;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.PutItemRequest;
-import com.amazonaws.services.dynamodbv2.model.PutItemResult;
 
 public class TestInsert {
 	final static String insertURL = "http://localhost:8080/CrystallizeDynamoBackend/Insert";
 
 	public static void main(String[] args) throws JSONException, IOException {		
 		basicTest();
-		//		uploadDictionary();
+		//uploadDictionary();
 	}
 	
 	public static void basicTest() throws JSONException, IOException {
 		JSONObject document = new JSONObject();
-		document.put("grade", "A-");
+		document.put("grade", "A+");
 		System.out.println(document.toString());
 		
 		JSONObject parameters = new JSONObject();
-		parameters.append("document", document.toString());
-		parameters.append("table", "Test");
-		parameters.append("ID", "321");
+		parameters.put("document", document);
+		parameters.put("table", "Test");
+		parameters.put("ID", "123");
 		System.out.println(parameters.toString());
 		
 		HTTPConnection.excutePost(insertURL, parameters.toString());
@@ -87,9 +79,8 @@ public class TestInsert {
 //		}
 //	}
 	
-	public static void uploadDictionary() throws JSONException, IOException {
-		String filename = "./data/JMdict_e.json";
-		BufferedReader br = new BufferedReader(new FileReader(filename));
+	public static void uploadPlayer(String ID, String fileName) throws JSONException, IOException {
+		BufferedReader br = new BufferedReader(new FileReader(fileName));
 		try {
 		    StringBuilder sb = new StringBuilder();
 		    String line = br.readLine();
@@ -100,37 +91,76 @@ public class TestInsert {
 		        sb.append(System.lineSeparator());
 		        line = br.readLine();
 		    }
+		    JSONObject document = new JSONObject(sb.toString());
+		    
+	    	//Store item
+	    	JSONObject parameters = new JSONObject();
+			parameters.append("table", "Players");
+			parameters.append("ID", ID);
+			parameters.append("document", document.toString());
+
+			System.out.println(parameters.toString());
+			
+		    HTTPConnection.excutePost(insertURL, parameters.toString());
+		} finally {
+		    br.close();
+		}
+	}
+	
+	public static void uploadDictionary() throws JSONException, IOException {
+		String filename = "./data/JMdict_e.json";
+		BufferedReader br = new BufferedReader(new FileReader(filename));
+		try {
+		    StringBuilder sb = new StringBuilder();
+		    String line = br.readLine();
+
+		    while (line != null) {
+		        sb.append(line);
+		        sb.append(System.lineSeparator());
+		        line = br.readLine();
+		    }
 		    JSONObject obj = new JSONObject(sb.toString());
-		    System.out.println(JSONObject.getNames(obj));
+		    //System.out.println(JSONObject.getNames(obj));
 		    JSONObject JMdict = obj.getJSONObject("JMdict");
 		    JSONArray entries = JMdict.getJSONArray("entry");
-		    for(int i = 0; i < 5; i++) {
+		    for(int i = 25; i < 50; i++) {
 		    	JSONObject entry = entries.getJSONObject(i);
 		    	
 		    	System.out.println(entry.toString());
-		    	
-		    	String englishStr = "";
-		    	JSONObject englishTranslations = entry.getJSONObject("sense").getJSONObject("gloss");
+		    	Object englishTranslations = entry.get("sense");
+		    	if(englishTranslations instanceof String) {
+		    		System.out.println("String: " + englishTranslations.toString());
+		    	}
+		    	else if(englishTranslations instanceof JSONArray) {
+		    		System.out.println("Array of Strings: " + englishTranslations.toString());
+		    	}
+		    	else {
+		    		System.out.println("Unknown object");
+		    	}
+		    	System.out.println();
+//		    	
+//		    	String englishStr = "";
+//		    	JSONObject englishTranslations = entry.getJSONObject("sense").getJSONObject("gloss");
 //		    	for(int j = 0; j < englishTranslations.length(); j++){
 //		    		englishStr += englishTranslations.getString(j) + ", ";
 //		    	}
-		    	
-		    	//Store item
-		    	JSONObject parameters = new JSONObject();
-				parameters.append("table", "Dictionary");
-		    	if(entry.has("k_ele")) {
-		    		JSONObject kanji = entry.getJSONObject("k_ele");
-					parameters.append("Kanji", kanji);
-		    	}
-		    	if(entry.has("r_ele")) {
-		    		JSONObject kana = entry.getJSONObject("r_ele");
-					parameters.append("Kana", kana);
-		    	}
-				parameters.append("English", englishTranslations);
-				//FIX THIS
-				System.out.println(parameters.toString());
-				
-			    HTTPConnection.excutePost(insertURL, parameters.toString());
+//		    	
+//		    	//Store item
+//		    	JSONObject parameters = new JSONObject();
+//				parameters.append("table", "Dictionary");
+//		    	if(entry.has("k_ele")) {
+//		    		JSONObject kanji = entry.getJSONObject("k_ele");
+//					parameters.append("Kanji", kanji);
+//		    	}
+//		    	if(entry.has("r_ele")) {
+//		    		JSONObject kana = entry.getJSONObject("r_ele");
+//					parameters.append("Kana", kana);
+//		    	}
+//				parameters.append("English", englishTranslations);
+//				//FIX THIS
+//				System.out.println(parameters.toString());
+//				
+//			    HTTPConnection.excutePost(insertURL, parameters.toString());
 		    }
 		} finally {
 		    br.close();

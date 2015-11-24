@@ -29,12 +29,8 @@ public class QueryServlet extends HttpServlet {
 		JSONObject parameters;
 		try {
 			parameters = ParameterParser.getParameterObject(request);
-			out.append(parameters.toString() + "\n");
-
 			JSONObject refinedParams = refineParameters(parameters);
-			out.append(refinedParams.toString() + "\n");
-			
-			String result = Query.query(refinedParams);	
+			String result = Query.query(refinedParams);
 			out.append(result);
 			
 		} catch (Exception e) {
@@ -54,12 +50,9 @@ public class QueryServlet extends HttpServlet {
 		
 		// check table parameter
 		if(parameters.has("table")) {
-			JSONArray tableArray = parameters.getJSONArray("table");
-			if(tableArray.length() == 1) {
-				refined.put("table", tableArray.get(0));
-			}
-			else if(tableArray.length() > 1) { throw new Exception("Parameters 'table' has more than one value"); }
-			else { throw new Exception("Parameters 'table' is empty"); }
+			String table = parameters.getString("table");
+			if (!table.equals("")) refined.put("table", table);
+			else { throw new Exception("Parameter 'table' is empty"); }
 		}
 		else { throw new Exception("Parameter 'table' missing"); }
 		

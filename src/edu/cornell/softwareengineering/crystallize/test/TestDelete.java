@@ -6,19 +6,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class TestDelete {
-	final static String deleteURL = "http://localhost:8080/CrystallizeBackend/Delete";
+	final static String deleteURL = "http://localhost:8080/CrystallizeDynamoBackend/Delete";
 	
 	public static void main(String[] args) throws JSONException, IOException {
 		basicTest();
 	}
 	
 	public static void basicTest() throws JSONException, IOException {
-		JSONObject query = new JSONObject();
-		query.put("name.firstname", "peter");
-		
 		JSONObject parameters = new JSONObject();
-		parameters.append("query", query.toString());
-		parameters.append("collection", "TestInsert");
+		parameters.put("ID", "123");
+		parameters.put("table", "Test");
 		System.out.println(parameters.toString());
 		
 		HTTPConnection.excutePost(deleteURL, parameters.toString());
