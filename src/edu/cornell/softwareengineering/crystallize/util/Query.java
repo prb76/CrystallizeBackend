@@ -32,33 +32,17 @@ public class Query {
 		}
 		
 		AmazonDynamoDBClient dynamoDB = DynamoDBClient.getDynamoClient();
-				
-//		// Create scan request
-//		HashMap<String, Condition> scanRequest = new HashMap<String, Condition>();
-//		for(int queryIdx = 0; queryIdx < query.length(); queryIdx++) {
-//			JSONObject queryItem = query.getJSONObject(queryIdx);
-//			
-//			ArrayList<AttributeValue> valueList = new ArrayList<AttributeValue>();
-//			JSONArray jsonValueList = queryItem.getJSONArray("values");
-//			for(int i = 0; i < jsonValueList.length(); i++) {
-//				valueList.add(new AttributeValue().withS(jsonValueList.getString(i)));
-//			}
-//			
-//			Condition condition = new Condition()
-//					.withComparisonOperator(queryItem.getString("operator"))
-//					.withAttributeValueList(valueList);
-//			scanRequest.put(queryItem.getString("attribute"), condition);
-//		}
 		
 		// Create list of attributes to retrieve
-		ArrayList<String> attributesList = new ArrayList<String>();
+		String filterString = "";
 		for(int i = 0; i < filters.length(); i++) {
-			attributesList.add(filters.getString(i));
+			if(!filterString.equals("")) filterString += ", ";
+			filterString += filters.getString(i);
 		}
 		
 		ScanRequest request = getScanRequest(tableName, query);
 		
-		if(!attributesList.isEmpty()) request.withAttributesToGet(attributesList);
+		if(!filterString.equals("")) request.setProjectionExpression(filterString);
 		
 		ScanResult result = dynamoDB.scan(request);
 		

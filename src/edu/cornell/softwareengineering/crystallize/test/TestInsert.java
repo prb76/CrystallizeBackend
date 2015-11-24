@@ -13,7 +13,7 @@ public class TestInsert {
 
 	public static void main(String[] args) throws JSONException, IOException {		
 		basicTest();
-		//uploadDictionary();
+		//uploadPlayer("54321", "./data/ConcernedSheep.json");
 	}
 	
 	public static void basicTest() throws JSONException, IOException {
@@ -95,9 +95,9 @@ public class TestInsert {
 		    
 	    	//Store item
 	    	JSONObject parameters = new JSONObject();
-			parameters.append("table", "Players");
-			parameters.append("ID", ID);
-			parameters.append("document", document.toString());
+			parameters.put("table", "Players");
+			parameters.put("ID", ID);
+			parameters.put("document", document);
 
 			System.out.println(parameters.toString());
 			
@@ -106,64 +106,5 @@ public class TestInsert {
 		    br.close();
 		}
 	}
-	
-	public static void uploadDictionary() throws JSONException, IOException {
-		String filename = "./data/JMdict_e.json";
-		BufferedReader br = new BufferedReader(new FileReader(filename));
-		try {
-		    StringBuilder sb = new StringBuilder();
-		    String line = br.readLine();
 
-		    while (line != null) {
-		        sb.append(line);
-		        sb.append(System.lineSeparator());
-		        line = br.readLine();
-		    }
-		    JSONObject obj = new JSONObject(sb.toString());
-		    //System.out.println(JSONObject.getNames(obj));
-		    JSONObject JMdict = obj.getJSONObject("JMdict");
-		    JSONArray entries = JMdict.getJSONArray("entry");
-		    for(int i = 25; i < 50; i++) {
-		    	JSONObject entry = entries.getJSONObject(i);
-		    	
-		    	System.out.println(entry.toString());
-		    	Object englishTranslations = entry.get("sense");
-		    	if(englishTranslations instanceof String) {
-		    		System.out.println("String: " + englishTranslations.toString());
-		    	}
-		    	else if(englishTranslations instanceof JSONArray) {
-		    		System.out.println("Array of Strings: " + englishTranslations.toString());
-		    	}
-		    	else {
-		    		System.out.println("Unknown object");
-		    	}
-		    	System.out.println();
-//		    	
-//		    	String englishStr = "";
-//		    	JSONObject englishTranslations = entry.getJSONObject("sense").getJSONObject("gloss");
-//		    	for(int j = 0; j < englishTranslations.length(); j++){
-//		    		englishStr += englishTranslations.getString(j) + ", ";
-//		    	}
-//		    	
-//		    	//Store item
-//		    	JSONObject parameters = new JSONObject();
-//				parameters.append("table", "Dictionary");
-//		    	if(entry.has("k_ele")) {
-//		    		JSONObject kanji = entry.getJSONObject("k_ele");
-//					parameters.append("Kanji", kanji);
-//		    	}
-//		    	if(entry.has("r_ele")) {
-//		    		JSONObject kana = entry.getJSONObject("r_ele");
-//					parameters.append("Kana", kana);
-//		    	}
-//				parameters.append("English", englishTranslations);
-//				//FIX THIS
-//				System.out.println(parameters.toString());
-//				
-//			    HTTPConnection.excutePost(insertURL, parameters.toString());
-		    }
-		} finally {
-		    br.close();
-		}
-	}	
 }
