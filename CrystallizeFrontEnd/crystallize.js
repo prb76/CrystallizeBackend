@@ -21,6 +21,14 @@ function KeyCheck(event)
    }
 }
 
+function mysubmit() {
+    var responseArray = new Array();
+    for (var i = 0; i < runningList.length; i++) {
+        responseArray[i] = {FormID:0, Tags:null, WordID: runningList[i]};
+    }
+    alert(responseArray);
+}
+
 $(function(){
 function split( val ) {
     return val.split( / \s*/ );
@@ -28,16 +36,6 @@ function split( val ) {
 function extractLast( term ) {
     return split( term ).pop();
 }
-
-// function getJapaneseWords(query) {
-//     var xmlHttp = new XMLHttpRequest();
-//     xmlHttp.onreadystatechange = function() { 
-//         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-//             callback(xmlHttp.responseText);
-//     }
-//     xmlHttp.open("GET", theUrl, true); // true for asynchronous 
-//     xmlHttp.send(null);
-// }
 
 function getJapaneseWords(query) {
     // $.ajax({
@@ -49,15 +47,15 @@ function getJapaneseWords(query) {
     //     return msg;
     //   });
     var msg = '{ "results" : [' +
-    '{ "objectID":1 , "jap":"Hello" },' +
-    '{ "objectID":2 , "jap":"Hell" },' +
-    '{ "objectID":3 , "jap":"Hi" } ]}';
+    '{ "ent_seq":1 , "jap":"Hello" },' +
+    '{ "ent_seq":2 , "jap":"Hell" },' +
+    '{ "ent_seq":3 , "jap":"Hi" } ]}';
     var jsonObject = JSON.parse(msg);
     var wordArray = new Array();
     var wordObjectArray = jsonObject["results"];
     for (i=0; i < wordObjectArray.length; i++) {
         wordObject = wordObjectArray[i];
-        wordArray[i] = wordObject["objectID"] + ":" + wordObject["jap"];
+        wordArray[i] = {label: wordObject["jap"], value: wordObject["ent_seq"]};
     }
     return wordArray;
   }
@@ -72,7 +70,7 @@ $( "#query" )
     })
 
     .autocomplete({
-        minLength: 0,
+        minLength: 1,
         source: function( request, response ) {
             // delegate back to autocomplete, but extract the last term
             // response( $.ui.autocomplete.filter(
@@ -89,10 +87,9 @@ $( "#query" )
             // remove the current input
             terms.pop();
             // add the selected item
-            var word = ui.item.value.split(":");
-            runningList.push(word[0]);
-            alert(runningList);
-            terms.push( word[1] );
+            runningList.push(ui.item.value);
+            // alert(runningList);
+            terms.push( ui.item.label);
             // add placeholder to get the space at the end
             terms.push( "" );
             this.value = terms.join( " " );
