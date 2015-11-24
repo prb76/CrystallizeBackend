@@ -38,26 +38,39 @@ function extractLast( term ) {
 }
 
 function getJapaneseWords(query) {
-    // $.ajax({
-    //   method: "POST",
-    //   url: "",
-    //   data: {text: query}
-    // })
-    //   .done(function( msg ) {
-    //     return msg;
-    //   });
-    var msg = '{ "results" : [' +
-    '{ "ent_seq":1 , "jap":"Hello" },' +
-    '{ "ent_seq":2 , "jap":"Hell" },' +
-    '{ "ent_seq":3 , "jap":"Hi" } ]}';
-    var jsonObject = JSON.parse(msg);
-    var wordArray = new Array();
-    var wordObjectArray = jsonObject["results"];
-    for (i=0; i < wordObjectArray.length; i++) {
-        wordObject = wordObjectArray[i];
-        wordArray[i] = {label: wordObject["jap"], value: wordObject["ent_seq"]};
-    }
-    return wordArray;
+	var request = {};
+	request.table = "Dictionary";
+	
+	var queryJSON = {};
+	queryJSON.attribute = "English";
+	queryJSON.operator = "CONTAINS";
+	queryJSON.values = [query];
+
+	request.query = queryJSON;
+	console.log(request);
+	
+    $.ajax({
+        type: "POST",
+        url: "http://localhost:8080/CrystallizeDynamoBackend/Query",
+        data: request,
+        dataType: 'json',
+        contentType: 'application/json',
+        crossDomain: true,
+        success: function( res ) {
+              var msg = '{ "results" : [' +
+              '{ "ent_seq":1 , "jap":"Hello" },' +
+              '{ "ent_seq":2 , "jap":"Hell" },' +
+              '{ "ent_seq":3 , "jap":"Hi" } ]}';
+              var jsonObject = JSON.parse(msg);
+              var wordArray = new Array();
+              var wordObjectArray = jsonObject["results"];
+              for (i=0; i < wordObjectArray.length; i++) {
+                  wordObject = wordObjectArray[i];
+                  wordArray[i] = {label: wordObject["jap"], value: wordObject["ent_seq"]};
+              }
+              return wordArray;
+        }
+    	});
   }
 
 $( "#query" )
