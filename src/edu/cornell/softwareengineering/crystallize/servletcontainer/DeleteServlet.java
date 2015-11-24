@@ -51,30 +51,28 @@ public class DeleteServlet extends HttpServlet {
 		JSONObject refined = new JSONObject();
 		if(parameters.length() == 0) throw new Exception("No parameters found");
 		
-		// check collection parameter
-		if(parameters.has("collection")) {
-			JSONArray collectionArray = parameters.getJSONArray("collection");
-			if(collectionArray.length() == 1) {
-				refined.put("collection", collectionArray.get(0));
+		// check table parameter
+		if(parameters.has("table")) {
+			JSONArray tableArray = parameters.getJSONArray("table");
+			if(tableArray.length() == 1) {
+				refined.put("table", tableArray.getString(0));
 			}
-			else if(collectionArray.length() > 1) { throw new Exception("Parameters 'collection' has more than one value"); }
-			else { throw new Exception("Parameters 'collection' is empty"); }
+			else if(tableArray.length() > 1) { throw new Exception("Parameters 'table' has more than one value"); }
+			else { throw new Exception("Parameters 'table' is empty"); }
 		}
-		else { throw new Exception("Parameter 'collection' missing"); }
+		else { throw new Exception("Parameter 'table' missing"); }
 		
-		// check query parameter
-		if(parameters.has("query")) {
-			JSONArray queryArray = parameters.getJSONArray("query");
-			if(queryArray.length() == 1) {
-				refined.put("query", new JSONObject(queryArray.getString(0)));
+		// check ID parameter
+		if(parameters.has("ID")) {
+			JSONArray IDArray = parameters.getJSONArray("ID");
+			if(IDArray.length() == 1) {
+				refined.put("ID", IDArray.getString(0));
 			}
-			else if (queryArray.length() > 1) {
-				throw new Exception("Parameter 'query' has too many values");
-			}
-			else { throw new Exception("Parameter 'query' is empty"); }		}
-		else { throw new Exception("Parameter 'query' missing"); }
+			else if(IDArray.length() > 1) { throw new Exception("Parameters 'ID' has more than one value"); }
+			else { throw new Exception("Parameters 'ID' is empty"); }
+		}
+		else { throw new Exception("Parameter 'ID' missing"); }
 		
 		return refined;
 	}
-	
 }

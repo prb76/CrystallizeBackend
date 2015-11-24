@@ -6,23 +6,41 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
+
 public class TestQuery {
-	final static String queryURL = "http://localhost:8080/CrystallizeBackend/Query";
+	final static String queryURL = "http://localhost:8080/CrystallizeDynamoBackend/Query";
 	
 	public static void main(String[] args) throws JSONException, IOException {
 		basicTest();
-		testFilters();
-		testPlayers2();
+		//nestDocTest();
 	}
 	
 	public static void basicTest() throws JSONException, IOException {
-		JSONObject query = new JSONObject();
-		query.put("name.firstname", "peter");
+		JSONObject queryItem = new JSONObject();
+		queryItem.put("attribute", "document.grade");
+		queryItem.put("operator", "CONTAINS");
+		queryItem.put("values", new JSONArray().put("A").put("B"));
+		
+		
 		
 		JSONObject parameters = new JSONObject();
-		parameters.append("query", query.toString());
-		parameters.append("collection", "TestInsert");
-		parameters.append("filters", (new JSONArray()).toString());
+		parameters.append("table", "Test");
+		parameters.append("query", queryItem);
+		System.out.println(parameters.toString());
+		
+		HTTPConnection.excutePost(queryURL, parameters.toString());
+	}
+	
+	public static void nestDocTest() throws JSONException, IOException {
+		JSONObject queryItem = new JSONObject();
+		queryItem.put("attribute", "document.grade");
+		queryItem.put("operator", "EQ");
+		queryItem.put("values", new JSONArray().put("B-"));
+		
+		JSONObject parameters = new JSONObject();
+		parameters.append("table", "Test");
+		parameters.append("query", queryItem);
 		System.out.println(parameters.toString());
 		
 		HTTPConnection.excutePost(queryURL, parameters.toString());

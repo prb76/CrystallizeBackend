@@ -12,7 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import edu.cornell.softwareengineering.crystallize.util.Insert;
-import edu.cornell.softwareengineering.crystallize.util.common.DynamoDBClient;
 import edu.cornell.softwareengineering.crystallize.util.common.ParameterParser;
 
 /**

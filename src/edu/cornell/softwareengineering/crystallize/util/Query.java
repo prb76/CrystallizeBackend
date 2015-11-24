@@ -1,81 +1,143 @@
 package edu.cornell.softwareengineering.crystallize.util;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.util.JSON;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
+import com.amazonaws.services.dynamodbv2.model.ScanRequest;
+import com.amazonaws.services.dynamodbv2.model.ScanResult;
 
 import edu.cornell.softwareengineering.crystallize.util.common.DynamoDBClient;
 
 public class Query {
 	public static String query(JSONObject parameters) throws Exception {
-		String collection;
-		JSONObject query;
-		JSONObject filters;
+		String tableName;
+		JSONArray query;
+		JSONArray filters;
 		
 		try {
-			collection = parameters.getString("collection");
-			query = parameters.getJSONObject("query");
-			filters = parameters.getJSONObject("filters");
+			tableName = parameters.getString("table");
+			query = parameters.getJSONArray("query");
+			filters = parameters.getJSONArray("filters");
 		} catch (JSONException e) {
 			throw new Exception("Parameter error inside Insert class");
 		}
 		
-		DBCollection coll = DynamoDBClient.getCollection(collection);
+		AmazonDynamoDBClient dynamoDB = DynamoDBClient.getDynamoClient();
+				
+//		// Create scan request
+//		HashMap<String, Condition> scanRequest = new HashMap<String, Condition>();
+//		for(int queryIdx = 0; queryIdx < query.length(); queryIdx++) {
+//			JSONObject queryItem = query.getJSONObject(queryIdx);
+//			
+//			ArrayList<AttributeValue> valueList = new ArrayList<AttributeValue>();
+//			JSONArray jsonValueList = queryItem.getJSONArray("values");
+//			for(int i = 0; i < jsonValueList.length(); i++) {
+//				valueList.add(new AttributeValue().withS(jsonValueList.getString(i)));
+//			}
+//			
+//			Condition condition = new Condition()
+//					.withComparisonOperator(queryItem.getString("operator"))
+//					.withAttributeValueList(valueList);
+//			scanRequest.put(queryItem.getString("attribute"), condition);
+//		}
 		
-		// Query
-    	DBObject queryObj = (DBObject) JSON.parse(query.toString());
-    	DBObject filtersObj = (DBObject) JSON.parse(filters.toString());
-    	DBCursor cursor = coll.find(queryObj, filtersObj);
-    	String result;
-    	if (cursor.length() > 0) {
-    		result = cursor.toArray().toString();
-    	}
-    	else {
-    		result = "No results";
-    	}
-		return result;
+		// Create list of attributes to retrieve
+		ArrayList<String> attributesList = new ArrayList<String>();
+		for(int i = 0; i < filters.length(); i++) {
+			attributesList.add(filters.getString(i));
+		}
+		
+		ScanRequest request = getScanRequest(tableName, query);
+		
+		if(!attributesList.isEmpty()) request.withAttributesToGet(attributesList);
+		
+		ScanResult result = dynamoDB.scan(request);
+		
+		List<Map<String, AttributeValue>> items = result.getItems();
+		
+		JSONObject resultJSON = new JSONObject();
+		resultJSON.put("ok", true);
+		resultJSON.put("results", items);
+		
+    	return resultJSON.toString();
 	}
 	
-//	// For testing purposes
-//	public static String query(String collection) {
-//		Map<String, String[]> queryTerms = new HashMap<String, String[]>();
-//		String[] values = {"prateek"};
-//		queryTerms.put("name", values);
-//		
-//		return queryTerms(collection, queryTerms);
-//	}
+	private static ScanRequest getScanRequest(String tableName, JSONArray query) throws JSONException {
+		ScanRequest request = new ScanRequest(tableName);
+		
+		HashMap<String, AttributeValue> valueMap = new HashMap<String, AttributeValue>();
+		String expression = "";
+		int valueKeyID = 0;
+		
+		for(int i = 0; i < query.length(); i++) {
+			if(expression != "") expression += " AND ";
+			
+			JSONObject queryItem = query.getJSONObject(i);
+			String attribute = queryItem.getString("attribute");
+			String operator = queryItem.getString("operator");
+			JSONArray values = queryItem.getJSONArray("values");
+			
+			expression += "(";
+			for(int valueIndex = 0; valueIndex < values.length(); valueIndex++) {
+				if(valueIndex > 0) expression += " OR ";
+				String value = values.getString(valueIndex);
+				String valueKey = ":value" + (valueKeyID++);
+				valueMap.put(valueKey, new AttributeValue().withS(value));
+				
+				expression += getExpression(attribute, valueKey, operator);
+			}
+			expression += ")";
+		}
+		
+		request
+			.withFilterExpression(expression)
+			.withExpressionAttributeValues(valueMap);
+		
+		return request;
+	}
 	
-//	private static DBObject getFilters(JSONArray filters) {
-//		DBObject filterObj = new BasicDBObject();
-//		
-//		for(int i = 0; i < filters.length(); i++) {
-//			try {
-//				filterObj.put((String) filters.get(i), new Integer(1));
-//			} catch (JSONException e) {
-//				// TODO Auto-generated catch block
-//				return null;
-//			}
-//		}
-//		
-//		return filterObj;
-//	}
-//	
-//	// Converts an HTTP parameter mapping to a DBObject
-//	private static QueryBuilder getParameterObject(Map<String, String[]> parameterMap) {
-//		QueryBuilder parameterObj = new QueryBuilder();
-//		
-//		Iterator parameterIter = parameterMap.entrySet().iterator();
-//		while(parameterIter.hasNext()) {
-//			Map.Entry<String, String[]> pair = (Map.Entry<String, String[]>)parameterIter.next();
-//			String key = pair.getKey();
-//			String[] values = pair.getValue();
-//			parameterObj.put(key).in(values);
-//		}
-//		return parameterObj;
-//	}
-	
+	private static String getExpression(String attribute, String value, String operator) {
+		//General Operators
+		if (operator.equals(ComparisonOperator.EQ.toString())) 
+			return attribute + " = " + value;
+		else if (operator.equals(ComparisonOperator.NE.toString()))
+			return attribute + " <> " + value;
+		
+		//Number Operators
+		else if (operator.equals(ComparisonOperator.LT.toString())) 
+			return attribute + " < " + value;
+		else if (operator.equals(ComparisonOperator.LE.toString()))
+			return attribute + " <= " + value;
+		else if (operator.equals(ComparisonOperator.GT.toString()))
+			return attribute + " >= " + value;
+		else if (operator.equals(ComparisonOperator.GE.toString()))
+			return attribute + " > " + value;
+		
+		//String Operators
+		else if (operator.equals(ComparisonOperator.BEGINS_WITH.toString()))
+			return "begins_with(" + attribute + ", " + value + ")";
+		else if (operator.equals(ComparisonOperator.NOT_NULL.toString()))
+			return "attribute_exists(" + attribute + ")";
+		else if (operator.equals(ComparisonOperator.NULL.toString()))
+			return "attribute_not_exists(" + attribute + ")";
+		
+		//String & Set Operators
+		else if (operator.equals(ComparisonOperator.CONTAINS.toString()))
+			return "contains(" + attribute + ", " + value + ")";
+
+		//List Operators
+		else if (operator.equals(ComparisonOperator.IN.toString()))
+			return value + " IN " + attribute;
+		
+		else return "";
+	}
 }

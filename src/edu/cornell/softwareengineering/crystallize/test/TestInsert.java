@@ -21,48 +21,74 @@ public class TestInsert {
 
 	public static void main(String[] args) throws JSONException, IOException {		
 		basicTest();
+		//		uploadDictionary();
 	}
 	
 	public static void basicTest() throws JSONException, IOException {
 		JSONObject document = new JSONObject();
-		document.put("grade", "B-");
+		document.put("grade", "A-");
 		System.out.println(document.toString());
 		
 		JSONObject parameters = new JSONObject();
 		parameters.append("document", document.toString());
 		parameters.append("table", "Test");
-		parameters.append("ID", "123");
+		parameters.append("ID", "321");
 		System.out.println(parameters.toString());
 		
 		HTTPConnection.excutePost(insertURL, parameters.toString());
 	}
 	
-	public static void complexTest() throws JSONException, IOException {
-		JSONObject name = new JSONObject();
-		name.put("firstname", "peter");
-		name.put("lastname", "baker");
-		
-		JSONArray grades = new JSONArray();
-		grades.put("A-");
-		grades.put("C+");
-		grades.put("B+");
-		grades.put("B-");
-		System.out.println(grades.toString());
-		
-		JSONObject document = new JSONObject();
-		document.put("name", name);
-		document.put("grades", grades);
-		System.out.println(document.toString());
-		
-		JSONObject parameters = new JSONObject();
-		parameters.append("document", document);
-		parameters.append("collection", "TestInsert");
-		System.out.println(parameters.toString());
-		
-		HTTPConnection.excutePost(insertURL, parameters.toString());
-	}
+//	public static void complexTest() throws JSONException, IOException {
+//		JSONObject name = new JSONObject();
+//		name.put("firstname", "peter");
+//		name.put("lastname", "baker");
+//		
+//		JSONArray grades = new JSONArray();
+//		grades.put("A-");
+//		grades.put("C+");
+//		grades.put("B+");
+//		grades.put("B-");
+//		System.out.println(grades.toString());
+//		
+//		JSONObject document = new JSONObject();
+//		document.put("name", name);
+//		document.put("grades", grades);
+//		System.out.println(document.toString());
+//		
+//		JSONObject parameters = new JSONObject();
+//		parameters.append("document", document);
+//		parameters.append("collection", "TestInsert");
+//		System.out.println(parameters.toString());
+//		
+//		HTTPConnection.excutePost(insertURL, parameters.toString());
+//	}
+//	
+//	public static void playerTest(String filename) throws JSONException, IOException {
+//		BufferedReader br = new BufferedReader(new FileReader(filename));
+//		try {
+//		    StringBuilder sb = new StringBuilder();
+//		    String line = br.readLine();
+//
+//		    while (line != null) {
+//		        sb.append(line);
+//		        sb.append(System.lineSeparator());
+//		        line = br.readLine();
+//		    }
+//		    JSONObject player = new JSONObject(sb.toString());
+//		    
+//		    JSONObject parameters = new JSONObject();
+//			parameters.append("document", player);
+//			parameters.append("collection", "TestInsert");
+//			System.out.println(parameters.toString());
+//		    
+//		    HTTPConnection.excutePost(insertURL, parameters.toString());
+//		} finally {
+//		    br.close();
+//		}
+//	}
 	
-	public static void playerTest(String filename) throws JSONException, IOException {
+	public static void uploadDictionary() throws JSONException, IOException {
+		String filename = "./data/JMdict_e.json";
 		BufferedReader br = new BufferedReader(new FileReader(filename));
 		try {
 		    StringBuilder sb = new StringBuilder();
@@ -70,22 +96,44 @@ public class TestInsert {
 
 		    while (line != null) {
 		        sb.append(line);
+		        System.out.println(line);
 		        sb.append(System.lineSeparator());
 		        line = br.readLine();
 		    }
-		    JSONObject player = new JSONObject(sb.toString());
-		    
-		    JSONObject parameters = new JSONObject();
-			parameters.append("document", player);
-			parameters.append("collection", "TestInsert");
-			System.out.println(parameters.toString());
-		    
-		    HTTPConnection.excutePost(insertURL, parameters.toString());
+		    JSONObject obj = new JSONObject(sb.toString());
+		    System.out.println(JSONObject.getNames(obj));
+		    JSONObject JMdict = obj.getJSONObject("JMdict");
+		    JSONArray entries = JMdict.getJSONArray("entry");
+		    for(int i = 0; i < 5; i++) {
+		    	JSONObject entry = entries.getJSONObject(i);
+		    	
+		    	System.out.println(entry.toString());
+		    	
+		    	String englishStr = "";
+		    	JSONObject englishTranslations = entry.getJSONObject("sense").getJSONObject("gloss");
+//		    	for(int j = 0; j < englishTranslations.length(); j++){
+//		    		englishStr += englishTranslations.getString(j) + ", ";
+//		    	}
+		    	
+		    	//Store item
+		    	JSONObject parameters = new JSONObject();
+				parameters.append("table", "Dictionary");
+		    	if(entry.has("k_ele")) {
+		    		JSONObject kanji = entry.getJSONObject("k_ele");
+					parameters.append("Kanji", kanji);
+		    	}
+		    	if(entry.has("r_ele")) {
+		    		JSONObject kana = entry.getJSONObject("r_ele");
+					parameters.append("Kana", kana);
+		    	}
+				parameters.append("English", englishTranslations);
+				//FIX THIS
+				System.out.println(parameters.toString());
+				
+			    HTTPConnection.excutePost(insertURL, parameters.toString());
+		    }
 		} finally {
 		    br.close();
 		}
-		
-		
-	}
-	
+	}	
 }
