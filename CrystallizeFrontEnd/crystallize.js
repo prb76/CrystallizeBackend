@@ -1,34 +1,66 @@
+var runningList = new Array();
+
+document.addEventListener("keydown", KeyCheck);
+function KeyCheck(event)
+{
+   var KeyID = event.keyCode;
+   switch(KeyID)
+   {
+      case 8:
+      var text = document.getElementById("query").value;
+      if (text[text.length-1] != " ") {
+        var allWords = text.split(" ");
+        var wordToRemove = allWords[allWords.length-1];
+        text = text.substring(0,text.lastIndexOf(wordToRemove));
+        document.getElementById("query").value = text;
+        runningList.pop();
+      }
+      break; 
+      default:
+      break;
+   }
+}
+
 $(function(){
-var availableTags = [
-    "ActionScript",
-    "AppleScript",
-    "Asp",
-    "BASIC",
-    "C",
-    "C++",
-    "Clojure",
-    "COBOL",
-    "ColdFusion",
-    "Erlang",
-    "Fortran",
-    "Groovy",
-    "Haskell",
-    "Java",
-    "JavaScript",
-    "Lisp",
-    "Perl",
-    "PHP",
-    "Python",
-    "Ruby",
-    "Scala",
-    "Scheme"
-];
 function split( val ) {
     return val.split( / \s*/ );
 }
 function extractLast( term ) {
     return split( term ).pop();
 }
+
+// function getJapaneseWords(query) {
+//     var xmlHttp = new XMLHttpRequest();
+//     xmlHttp.onreadystatechange = function() { 
+//         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+//             callback(xmlHttp.responseText);
+//     }
+//     xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+//     xmlHttp.send(null);
+// }
+
+function getJapaneseWords(query) {
+    // $.ajax({
+    //   method: "POST",
+    //   url: "",
+    //   data: {text: query}
+    // })
+    //   .done(function( msg ) {
+    //     return msg;
+    //   });
+    var msg = '{ "results" : [' +
+    '{ "objectID":1 , "jap":"Hello" },' +
+    '{ "objectID":2 , "jap":"Hell" },' +
+    '{ "objectID":3 , "jap":"Hi" } ]}';
+    var jsonObject = JSON.parse(msg);
+    var wordArray = new Array();
+    var wordObjectArray = jsonObject["results"];
+    for (i=0; i < wordObjectArray.length; i++) {
+        wordObject = wordObjectArray[i];
+        wordArray[i] = wordObject["objectID"] + ":" + wordObject["jap"];
+    }
+    return wordArray;
+  }
 
 $( "#query" )
     // don't navigate away from the field on tab when selecting an item
@@ -43,11 +75,10 @@ $( "#query" )
         minLength: 0,
         source: function( request, response ) {
             // delegate back to autocomplete, but extract the last term
-            response( $.ui.autocomplete.filter(
-                availableTags, extractLast( request.term ) ) );
-            // response (["Hello1", "Hello2"]);
-            // var japArray = getJapaneseWords(extractLast( request.term ));
-            // response(japArray);
+            // response( $.ui.autocomplete.filter(
+            //     availableTags, extractLast( request.term ) ) );
+            wordArray = getJapaneseWords(extractLast( request.term ));
+            response(wordArray);
         },
         focus: function() {
             // prevent value inserted on focus
@@ -58,7 +89,10 @@ $( "#query" )
             // remove the current input
             terms.pop();
             // add the selected item
-            terms.push( ui.item.value );
+            var word = ui.item.value.split(":");
+            runningList.push(word[0]);
+            alert(runningList);
+            terms.push( word[1] );
             // add placeholder to get the space at the end
             terms.push( "" );
             this.value = terms.join( " " );
@@ -108,72 +142,3 @@ $( "#query" )
     });
 
 });
-
-// function autoComp() {
-
-
-// 	var fullInput = document.getElementById("dict").value;
-// 	var inputList = fullInput.split(" ");
-// 	var currentInput = inputList[inputList.length-1];
-// 	var words = [];
-// 	var url = window.location.origin;
-
-// 	document.getElementById("dropdown").innerHTML = "";
-// 	document.getElementById("dropdown").style.visibility = "hidden";
-
-//     if (currentInput != "" && currentInput != " ") {
-//     	showOptions(["Ford", "Volvo", "BMW"], event, currentInput);
-
-//  		// url = url + "/autocomplete?input="+ currentInput;
-//    //    	var xmlHttp = new XMLHttpRequest();
-//    //    	evt = event;
-//    //    	xmlHttp.onreadystatechange=function() {
-// 	  //       if (xmlHttp.readyState==4 && xmlHttp.status==200) {
-// 	  //           words = xmlHttp.responseText;
-// 	  //           if (words != "") {
-// 	  //             wordList = words.split(";");
-// 	  //             showOptions(wordList, evt, currentInput);
-// 	  //           }
-// 	  //         }
-//    //      }
-
-//    //    xmlHttp.open("GET", url, true);
-//    //    xmlHttp.send();
-//   }
-// }
-
-// function applySelect() {
-//   var drop = document.getElementById("dropdown");
-//   document.getElementById("dict").value = drop.options[drop.selectedIndex].text;
-// }
-
-// function showOptions(wordList, evt, query) {
-// 	alert("hello");
-//   document.getElementById("dropdown").innerHTML = "";
-//   for (i = 1; i < 3; i++) {
-//     if (wordList[i] != undefined) {
-//       document.getElementById("dropdown").size = i;
-//       if (i <= parseInt(wordList[0]))
-//         document.getElementById("dropdown").innerHTML = document.getElementById("dropdown").innerHTML + "<option style=\"color:#52188C;font-weight:bolder\" value=\"word" + i + "\">" + wordList[i] + "</option>";
-//       else
-//         document.getElementById("dropdown").innerHTML = document.getElementById("dropdown").innerHTML + "<option value=\"word" + i + "\">" + wordList[i] + "</option>";
-
-//     }
-//     else
-//       break;
-//     document.getElementById("dropdown").style.visibility = "visible";
-//   }
-
-//   var key = evt.keyCode || evt.charCode;
-
-//     if( key > 48 && key < 90 ) {
-//     if (wordList[1] != undefined) {
-//       currentValue = query;
-//       newValue = wordList[1];
-//       start = currentValue.length;
-//       end = newValue.length;
-//       document.getElementById("keywords").value = newValue;
-//       createSelection(document.getElementById("keywords"), start, end);
-//     }
-//   }
-// }
