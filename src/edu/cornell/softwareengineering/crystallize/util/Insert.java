@@ -1,7 +1,9 @@
 package edu.cornell.softwareengineering.crystallize.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -75,38 +77,26 @@ public class Insert {
 			throw new Exception("Parameter error inside Insert class");
 		}
 		
-		Item item = new Item().withPrimaryKey("ID", ID);
+		Item item = new Item();
 		
 		JSONArray keys = document.names();
 		for(int i = 0; i < keys.length(); i++) {
 			String key = keys.getString(i);
+			
 			Object value = JSONObject.wrap(document.get(key));
-			if(value instanceof JSONArray)
-				item.withJSON(key, ((JSONArray) value).toString());
-			else if(value instanceof JSONObject) 
-				item.withJSON(key, ((JSONObject) value).toString());
-			else if(value instanceof String)
-				item.withString(key, (String) value);
-			else if(value instanceof Double)
-				item.withDouble(key, (Double) value);
-			else if(value instanceof Integer)
-				item.withInt(key, (Integer) value);
-			else if(value instanceof Boolean)
-				item.withBoolean(key, (Boolean) value);
-			else
-				item.withNull(key);
+			setItemValue(item, key, value);
 		}
 		
 		Table table = DynamoDBClient.getTable(tableName);
 		
-		String updateExp = "";
+		String updateExp = "set ";
 		Map<String, String> expressionAttributeNames = new HashMap<String, String>();
 		Map<String, Object> expressionAttributeValues = new HashMap<String, Object>();
 		
 		Iterator<Entry<String, Object>> entries = item.attributes().iterator();
 		int counter = 0;
 		while(entries.hasNext()) {
-			if(!updateExp.equals("")) updateExp += " ";
+			if(!updateExp.equals("set ")) updateExp += ", ";
 			
 			Entry<String, Object> nextEntry = entries.next();
 			String keyName = "#attr" + counter;
@@ -114,7 +104,7 @@ public class Insert {
 			
 			expressionAttributeNames.put(keyName, nextEntry.getKey());
 			expressionAttributeValues.put(valName, nextEntry.getValue());
-			updateExp += "set " + keyName + " = " + valName;
+			updateExp += keyName + " = " + valName;
 			
 			counter++;
 		}
@@ -132,5 +122,30 @@ public class Insert {
 		resultJSON.put("results", result);
 		
     	return resultJSON.toString();
+	}
+	
+	public static void setItemValue(Item item, String key, Object value) throws JSONException {
+		if(value instanceof JSONArray) {
+			JSONArray temp = (JSONArray) value;
+			List<Object> valueList = new ArrayList<Object>();
+			for(int j = 0; j < temp.length(); j++) {
+				Item arrayItem = new Item();
+				setItemValue(arrayItem, "0", temp.get(j));
+				valueList.add(arrayItem.get("0"));
+			}
+			item.withList(key, valueList);
+		}
+		else if(value instanceof JSONObject) 
+			item.withJSON(key, ((JSONObject) value).toString());
+		else if(value instanceof String)
+			item.withString(key, (String) value);
+		else if(value instanceof Double)
+			item.withDouble(key, (Double) value);
+		else if(value instanceof Integer)
+			item.withInt(key, (Integer) value);
+		else if(value instanceof Boolean)
+			item.withBoolean(key, (Boolean) value);
+		else
+			item.withNull(key);
 	}
 }
