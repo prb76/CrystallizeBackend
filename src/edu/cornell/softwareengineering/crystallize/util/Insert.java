@@ -1,9 +1,9 @@
 package edu.cornell.softwareengineering.crystallize.util;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.PutItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.UpdateItemOutcome;
 
 import edu.cornell.softwareengineering.crystallize.util.common.DynamoDBClient;
 
@@ -62,4 +63,74 @@ public class Insert {
 	}
 	
 
+	public static String upsert(JSONObject parameters) throws Exception {
+		String tableName;
+		String ID;
+		JSONObject document;
+		try {
+			tableName = parameters.getString("table");
+			document = parameters.getJSONObject("document");
+			ID = parameters.getString("ID");
+		} catch (JSONException e) {
+			throw new Exception("Parameter error inside Insert class");
+		}
+		
+		Item item = new Item().withPrimaryKey("ID", ID);
+		
+		JSONArray keys = document.names();
+		for(int i = 0; i < keys.length(); i++) {
+			String key = keys.getString(i);
+			Object value = JSONObject.wrap(document.get(key));
+			if(value instanceof JSONArray)
+				item.withJSON(key, ((JSONArray) value).toString());
+			else if(value instanceof JSONObject) 
+				item.withJSON(key, ((JSONObject) value).toString());
+			else if(value instanceof String)
+				item.withString(key, (String) value);
+			else if(value instanceof Double)
+				item.withDouble(key, (Double) value);
+			else if(value instanceof Integer)
+				item.withInt(key, (Integer) value);
+			else if(value instanceof Boolean)
+				item.withBoolean(key, (Boolean) value);
+			else
+				item.withNull(key);
+		}
+		
+		Table table = DynamoDBClient.getTable(tableName);
+		
+		String updateExp = "";
+		Map<String, String> expressionAttributeNames = new HashMap<String, String>();
+		Map<String, Object> expressionAttributeValues = new HashMap<String, Object>();
+		
+		Iterator<Entry<String, Object>> entries = item.attributes().iterator();
+		int counter = 0;
+		while(entries.hasNext()) {
+			if(!updateExp.equals("")) updateExp += " ";
+			
+			Entry<String, Object> nextEntry = entries.next();
+			String keyName = "#attr" + counter;
+			String valName = ":val" + counter;
+			
+			expressionAttributeNames.put(keyName, nextEntry.getKey());
+			expressionAttributeValues.put(valName, nextEntry.getValue());
+			updateExp += "set " + keyName + " = " + valName;
+			
+			counter++;
+		}
+
+		UpdateItemOutcome result =  table.updateItem(
+		    "ID",          // key attribute name
+		    ID,           // key attribute value
+		    updateExp, // UpdateExpression
+		    expressionAttributeNames,
+		    expressionAttributeValues);
+		
+		
+		JSONObject resultJSON = new JSONObject();
+		resultJSON.put("ok", true);
+		resultJSON.put("results", result);
+		
+    	return resultJSON.toString();
+	}
 }

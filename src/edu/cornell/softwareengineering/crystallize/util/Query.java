@@ -67,7 +67,7 @@ public class Query {
 			
 			JSONObject queryItem = query.getJSONObject(i);
 			String attribute = queryItem.getString("attribute");
-			String operator = queryItem.getString("operator");
+			String operator = queryItem.getString("op");
 			JSONArray values = queryItem.getJSONArray("values");
 			
 			expression += "(";
