@@ -30,7 +30,7 @@ import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import com.amazonaws.services.dynamodbv2.util.Tables;
 
 public class HTTPConnection {
-    public static void excutePost(String targetURL, String parameters) throws IOException {
+    public static String excutePost(String targetURL, String parameters) throws IOException {
 		URL urlObject = new URL(targetURL);
 		HttpURLConnection con = (HttpURLConnection) urlObject.openConnection();
 		con.setDoOutput(true);
@@ -51,12 +51,13 @@ public class HTTPConnection {
 		    while ((line = br.readLine()) != null) {  
 		        sb.append(line + "\n");  
 		    }  
-
+		    
 		    br.close();  
-
-		    System.out.println(""+sb.toString());
+		    System.out.println("Returned JSON: "+sb.toString());
+		    return sb.toString();
 		}else{
-		    System.out.println(con.getResponseMessage());  
+		    System.out.println(con.getResponseMessage());
+		    return null;
 		}
 	}
 }

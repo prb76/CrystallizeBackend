@@ -16,18 +16,22 @@ public class TestInsert {
 		//uploadPlayer("54321", "./data/ConcernedSheep.json");
 	}
 	
+	public static void insertObject(String table, String ID, JSONObject document) throws JSONException, IOException {
+		JSONObject parameters = new JSONObject();
+		parameters.put("document", document);
+		parameters.put("table", table);
+		parameters.put("ID", ID);
+		System.out.println(parameters.toString());
+		
+		HTTPConnection.excutePost(insertURL, parameters.toString());
+	}
+	
 	public static void basicTest() throws JSONException, IOException {
 		JSONObject document = new JSONObject();
 		document.put("grade", "A-");
 		System.out.println(document.toString());
 		
-		JSONObject parameters = new JSONObject();
-		parameters.put("document", document);
-		parameters.put("table", "Test");
-		parameters.put("ID", "123");
-		System.out.println(parameters.toString());
-		
-		HTTPConnection.excutePost(insertURL, parameters.toString());
+		insertObject("Test", "123", document);
 	}
 	
 	public static void complexTest() throws JSONException, IOException {
@@ -38,6 +42,8 @@ public class TestInsert {
 		JSONArray grades = new JSONArray();
 		grades.put("A-");
 		grades.put(1234);
+		grades.put(true);
+		grades.put(10.1);
 		grades.put((new JSONObject()).put("NestedTest", 5));
 		grades.put((new JSONArray()).put(false));
 		grades.put("B-");
@@ -56,30 +62,6 @@ public class TestInsert {
 		
 		HTTPConnection.excutePost(insertURL, parameters.toString());
 	}
-//	
-//	public static void playerTest(String filename) throws JSONException, IOException {
-//		BufferedReader br = new BufferedReader(new FileReader(filename));
-//		try {
-//		    StringBuilder sb = new StringBuilder();
-//		    String line = br.readLine();
-//
-//		    while (line != null) {
-//		        sb.append(line);
-//		        sb.append(System.lineSeparator());
-//		        line = br.readLine();
-//		    }
-//		    JSONObject player = new JSONObject(sb.toString());
-//		    
-//		    JSONObject parameters = new JSONObject();
-//			parameters.append("document", player);
-//			parameters.append("collection", "TestInsert");
-//			System.out.println(parameters.toString());
-//		    
-//		    HTTPConnection.excutePost(insertURL, parameters.toString());
-//		} finally {
-//		    br.close();
-//		}
-//	}
 	
 	public static void uploadPlayer(String ID, String fileName) throws JSONException, IOException {
 		BufferedReader br = new BufferedReader(new FileReader(fileName));

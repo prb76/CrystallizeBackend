@@ -12,6 +12,15 @@ public class TestDelete {
 		basicTest();
 	}
 	
+	public static void deleteObject(String table, String ID) throws JSONException, IOException {
+		JSONObject parameters = new JSONObject();
+		parameters.put("ID", ID);
+		parameters.put("table", table);
+		System.out.println(parameters.toString());
+		
+		HTTPConnection.excutePost(deleteURL, parameters.toString());
+	}
+	
 	public static void basicTest() throws JSONException, IOException {
 		JSONObject parameters = new JSONObject();
 		parameters.put("ID", "123");
