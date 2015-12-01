@@ -88,69 +88,6 @@ public class UploadDictionary {
 		}
 	}	
 	
-//	public static String insertDictionary(JSONObject parameters) throws Exception {
-//		String tableName;
-//		String ID;
-//		JSONObject document;
-//		try {
-//			tableName = parameters.getString("table");
-//			document = parameters.getJSONObject("document");
-//			ID = parameters.getString("WordID");
-//		} catch (JSONException e) {
-//			throw new Exception("Parameter error inside Insert class");
-//		}
-//		
-//		Item item = new Item().withPrimaryKey("WordID", ID);
-//		
-//		JSONArray keys = document.names();
-//		for(int i = 0; i < keys.length(); i++) {
-//			String key = keys.getString(i);
-//			if(key.equals("English")) {
-//				Object value = JSONObject.wrap(document.get(key));
-//				if(value instanceof String) item.withString("English", (String) value);
-//				else item.withNull("English");
-//			}
-//			else if(key.equals("Kana")) {
-//				Object value = JSONObject.wrap(document.get(key));
-//				List<Map<String, String>> kanaObjects = new ArrayList<Map<String, String>>();
-//				
-//				if(value instanceof JSONArray) {
-//					JSONArray valueArray = (JSONArray) value;
-//					for(int j = 0; j < valueArray.length(); j++) {
-//						JSONObject newJSON = valueArray.getJSONObject(i);
-//						Map<String, String> newObj = new HashMap<String, String>();
-//						for(String name : JSONObject.getNames(newJSON)) {
-//							newObj.put(name, newJSON.getString(name));							
-//						}
-//						kanaObjects.add(newObj);
-//					}
-//				}
-//				else if(value instanceof JSONObject) { 
-//					JSONObject newJSON = (JSONObject) value;
-//					Map<String, String> newObj = new HashMap<String, String>();
-//					for(String name : JSONObject.getNames(newJSON)) {
-//						newObj.put(name, newJSON.getString(name));							
-//					}
-//					kanaObjects.add(newObj);
-//				}
-//				else { kanaObjects = null; }
-//				if(kanaObjects != null) item.withList("Kana", kanaObjects);
-//				else item.withNull("Kana");
-//			}
-//			else { item.withNull(key); }
-//		}
-//		
-//		Table table = DynamoDBClient.getTable(tableName);
-//		
-//		PutItemOutcome result = table.putItem(item);
-//		
-//		JSONObject resultJSON = new JSONObject();
-//		resultJSON.put("ok", true);
-//		resultJSON.put("results", result);
-//		
-//    	return resultJSON.toString();
-//	}
-	
 	/*
 	 *  Create string of English translations, separated into senses and different sense translations. 
 	 *  Ignores all fields other than "sense" and "gloss"
