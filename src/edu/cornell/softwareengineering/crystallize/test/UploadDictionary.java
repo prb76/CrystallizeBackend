@@ -1,17 +1,22 @@
 package edu.cornell.softwareengineering.crystallize.test;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.google.common.io.Files;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.XML;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.PutItemOutcome;
@@ -24,21 +29,17 @@ public class UploadDictionary {
 	public static void main(String[] args) throws JSONException, IOException {
 		uploadDictionary(10);
 	}
+	public static String readFile(String path, Charset encoding) throws IOException 
+    {
+    	String s = Files.toString(new File(path), StandardCharsets.UTF_8);
+//    	System.out.println("Read file = "+s);
+    	return s;
+    }
 	
 	public static void uploadDictionary(int entriesCount) throws JSONException, IOException {
 		String filename = "./data/JMdict_e.json";
-		BufferedReader br = new BufferedReader(new FileReader(filename));
 		try {
-		    StringBuilder sb = new StringBuilder();
-		    String line = br.readLine();
-
-		    while (line != null) {
-		        sb.append(line);
-		        sb.append(System.lineSeparator());
-		        line = br.readLine();
-		    }
-		    
-		    JSONObject obj = new JSONObject(sb.toString());
+		    JSONObject obj = XML.toJSONObject(readFile(filename, StandardCharsets.UTF_8));
 
 		    JSONObject JMdict = obj.getJSONObject("JMdict");
 		    JSONArray entries = JMdict.getJSONArray("entry");
@@ -83,9 +84,10 @@ public class UploadDictionary {
 //		    System.out.println(result.toString());
 		    System.out.println("Duration: " + (System.currentTimeMillis() - beginTime));
 		    
-		} finally {
-		    br.close();
 		}
+		catch (IOException e){
+        	e.printStackTrace(); 
+        }
 	}	
 	
 //	public static String insertDictionary(JSONObject parameters) throws Exception {
