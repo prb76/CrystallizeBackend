@@ -57,7 +57,8 @@ public class XMLtoJSONParser {
         	JSONObject xmlJSONObj = XML.toJSONObject(readFile(in, StandardCharsets.UTF_8));
         	//JSONObject xmlJSONObj = XML.toJSONObject(TEST_XML_STRING);
         	byte[] jsonAsBytes = xmlJSONObj.toString().getBytes(StandardCharsets.UTF_8);//xmlJSONObj.toString(PRETTY_PRINT_INDENT_FACTOR);
-            //System.out.println("jsonAsString = "+jsonAsString);
+        	String s = new String(jsonAsBytes);
+        	//System.out.println("jsonAsString = "+jsonAsString);
         	writeFile(out, jsonAsBytes);
             //System.out.println(jsonAsString);
         } catch (JSONException je) {
