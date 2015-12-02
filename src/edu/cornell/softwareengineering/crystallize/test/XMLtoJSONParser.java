@@ -51,10 +51,11 @@ public class XMLtoJSONParser {
 	public static void main(String[] args) {
 		JSONObject json = new JSONObject();
 		try {
-			String in = "C:\\Eileen\\Programming\\CrystallizeBackend\\data\\JMdict_e.xml";
-        	String out = "C:\\Eileen\\Programming\\CrystallizeBackend\\data\\JMdict_e.json";
-        	
-        	JSONObject xmlJSONObj = XML.toJSONObject(readFile(in, StandardCharsets.UTF_8));
+			String in = "C:\\Eileen\\Programming\\CrystallizeBackend\\data\\JMdict_sample.xml";
+        	String out = "C:\\Eileen\\Programming\\CrystallizeBackend\\data\\JMdict_sample.json";
+        	String r = readFile(in, StandardCharsets.UTF_8);
+        	System.out.println(r);
+        	JSONObject xmlJSONObj = XML.toJSONObject(r);
         	//JSONObject xmlJSONObj = XML.toJSONObject(TEST_XML_STRING);
         	byte[] jsonAsBytes = xmlJSONObj.toString().getBytes(StandardCharsets.UTF_8);//xmlJSONObj.toString(PRETTY_PRINT_INDENT_FACTOR);
             //System.out.println("jsonAsString = "+jsonAsString);
@@ -68,7 +69,7 @@ public class XMLtoJSONParser {
         }
 		
 		try {
-			String path = "C:\\Eileen\\Programming\\CrystallizeBackend\\data\\JMdict_e.json";
+			String path = "C:\\Eileen\\Programming\\CrystallizeBackend\\data\\JMdict_sample.json";
         	String s = readFile(path, StandardCharsets.UTF_8);
     		for(int i = 0; i<toReplace.length; i++){
                 if (s.contains(toReplace[i]))

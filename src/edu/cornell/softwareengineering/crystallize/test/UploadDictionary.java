@@ -2,6 +2,7 @@ package edu.cornell.softwareengineering.crystallize.test;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -35,7 +36,15 @@ public class UploadDictionary {
 //    	System.out.println("Read file = "+s);
     	return s;
     }
-	
+	public static void writeFile(String path, byte[] data) throws IOException 
+    {
+    	FileOutputStream stream = new FileOutputStream(path);
+    	try {
+    	    stream.write(data);
+    	} finally {
+    	    stream.close();
+    	}
+    }
 	public static void uploadDictionary(int entriesCount) throws JSONException, IOException {
 		String filename = "./data/JMdict_e.xml";
 		try {
