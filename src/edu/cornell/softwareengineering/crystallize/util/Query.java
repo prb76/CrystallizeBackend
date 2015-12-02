@@ -1,9 +1,11 @@
 package edu.cornell.softwareengineering.crystallize.util;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,9 +50,12 @@ public class Query {
 		
 		List<Map<String, AttributeValue>> items = result.getItems();
 		
+		JSONArray DynamoResults = new JSONArray(items);
+		JSONArray refinedResults = refineResults(DynamoResults);
+		
 		JSONObject resultJSON = new JSONObject();
 		resultJSON.put("ok", true);
-		resultJSON.put("results", items);
+		resultJSON.put("results", refinedResults);
 		
     	return resultJSON.toString();
 	}
@@ -123,5 +128,111 @@ public class Query {
 			return value + " IN " + attribute;
 		
 		else return "";
+	}
+	
+	/*
+	 * Iterates through all JSON object results in the items from a ScanResult
+	 * 
+	 * @param results - JSONArray of ScanResult items
+	 * 
+	 * @return JSONArray of refined items using the refineObjects function
+	 */
+	public static JSONArray refineResults(JSONArray results) throws JSONException {
+		JSONArray refinedResults = new JSONArray();
+		for (int i = 0; i < results.length(); i++) { 
+			JSONObject resultItem = results.getJSONObject(i);
+			JSONObject refinedItem = new JSONObject();
+			for(String key : JSONObject.getNames(resultItem)) {
+				refinedItem.put(key, refineObject(resultItem.getJSONObject(key)));
+			}
+			refinedResults.put(refinedItem);
+		}
+		return refinedResults;
+	}
+	
+	/*
+	 * Takes in a JSON with DynamoJSON format, which wraps values with a type String,
+	 * and converts to standard JSON
+	 * 
+	 * @param resultItem - a single JSON object in DynamoJSON format
+	 * 	ex. {"mixedList":{
+	 * 			"l":[
+	 * 				{"s":"A-"},
+	 * 				{"n":"1234"},
+	 * 				{"BOOL":true},
+	 * 				{"n":"10.1"},
+	 * 				{"m":{
+	 * 					"NestedTest":{"n":"5"}
+	 * 					}
+	 * 				},
+	 * 				{"l":[
+	 * 					{"BOOL":false}
+	 * 				]},
+	 * 				{"NULL":true},
+	 * 				{"s":"B-"}
+	 * 			]
+	 * 		}
+	 * 
+	 * @return Object result of extracting object from JSON, such as a JSONArray, JSONObject,
+	 * 	String, Integer, Double, Boolean, or null. Also returns null if resultItem is empty
+	 *  
+	 *  ex. {"mixedList":[
+	 *  		"A-",
+	 *  		"1234",
+	 *  		true,
+	 *  		"10.1",
+	 *  		{"NestedTest":"5"},
+	 *  		[false],
+	 *  		null,
+	 *  		"B-"
+	 *  		]
+	 *  	}
+	 */
+	public static Object refineObject(JSONObject resultItem) throws JSONException {
+		List<String> dataTypes = Arrays.asList(new String[] {"n", "s", "BOOL", "l", "m"});
+		
+		if(resultItem == null) return null;
+		for(String key : JSONObject.getNames(resultItem)) {
+			if(key.equals("NULL")) return null;
+			else {
+				// Check for String-AttributeValue objects					
+				for(String type : dataTypes) {
+					// JSONValue is a Type-Value mapping
+					if(resultItem.has(type)) {
+						if(type.equals("l")) {
+							JSONArray list = resultItem.getJSONArray(key);
+							JSONArray refinedList = new JSONArray();
+							
+							// Unwrap each value in list
+							for(int i = 0; i < list.length(); i++) {
+								refinedList.put(refineObject(list.getJSONObject(i)));
+							}
+							return refinedList;								
+						}
+						else if(type.equals("m")) {
+							JSONObject obj = resultItem.getJSONObject(key);
+							JSONObject refinedObj = new JSONObject();
+							
+							// Unwrap each value in map
+							for(String objKey : JSONObject.getNames(obj)) {
+								refinedObj.put(objKey, refineObject(obj.getJSONObject(objKey)));
+							}
+							
+							return refinedObj;
+							
+						}
+						else if(type.equals("n")) {
+							String number = resultItem.getString(key);
+							
+							return Double.parseDouble(number);
+						}
+						else {
+							return resultItem.get(type);
+						}
+					}
+				}
+			}
+		}
+		return null;
 	}
 }

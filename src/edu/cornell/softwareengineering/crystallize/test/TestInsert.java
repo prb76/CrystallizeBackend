@@ -11,8 +11,15 @@ import org.json.JSONObject;
 public class TestInsert {
 	final static String insertURL = "http://localhost:8080/CrystallizeDynamoBackend/Insert";
 
-	public static void main(String[] args) throws JSONException, IOException {		
-		complexTest();
+	public static void main(String[] args) throws JSONException, IOException {	
+		
+		JSONObject test = new JSONObject()
+			.put("int", 1)
+			.put("long", 2109841204)
+			.put("double", 1.2)
+			.put("bool", false);
+		System.out.println(test);
+		//complexTest();
 		//uploadPlayer("54321", "./data/ConcernedSheep.json");
 	}
 	

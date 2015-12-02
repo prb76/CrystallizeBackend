@@ -43,10 +43,10 @@ function getJapaneseWords(query) {
 	
 	var queryJSON = {};
 	queryJSON.attribute = "English";
-	queryJSON.operator = "CONTAINS";
+	queryJSON.op = "CONTAINS";
 	queryJSON.values = [query];
 
-	request.query = queryJSON;
+	request.query = [queryJSON];
 	console.log(request);
 	
     $.ajax({

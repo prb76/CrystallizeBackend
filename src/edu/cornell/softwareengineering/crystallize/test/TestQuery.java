@@ -124,7 +124,7 @@ public class TestQuery {
 		System.out.println("LOOK HERE: " + obj.toString());
 		
 		assertTrue(obj.has("ID"));
-		assertEquals("1", obj.getJSONObject("ID").get("s"));
+		assertEquals("1", obj.getString("ID"));
 		assertTrue(!obj.has("grade"));
 		
 		TestDelete.deleteObject("Test", "1");
@@ -166,9 +166,40 @@ public class TestQuery {
 		JSONObject obj = results.getJSONObject(0);
 		System.out.println(obj);
 		
-		JSONArray objList = obj.getJSONObject("mixedList").getJSONArray("l");
+		JSONArray objList = obj.getJSONArray("mixedList");
 		
 		System.out.println(objList);
+		
+		TestDelete.deleteObject("Test", "1");
+	}
+	
+	@Test
+	public void testResultRefine() throws JSONException, IOException {
+		JSONArray mixedList = new JSONArray();
+		mixedList.put("A-");
+		mixedList.put(1234);
+		mixedList.put(true);
+		mixedList.put(10.1);
+		mixedList.put((new JSONObject()).put("NestedTest", 5));
+		mixedList.put((new JSONArray()).put(false));
+		mixedList.put((Object) null);
+		mixedList.put("B-");
+		System.out.println(mixedList.toString());
+		
+		JSONObject document = new JSONObject();
+		document.put("Example", mixedList);
+
+		TestInsert.insertObject("Test", "1", document);
+		
+		// Query Item
+		JSONObject queryItem = new JSONObject();
+		queryItem.put("attribute", "ID");
+		queryItem.put("op", "EQ");
+		queryItem.put("values", new JSONArray().put("1"));
+
+		JSONArray results = query("Test", new JSONArray().put(queryItem), null);
+		assertEquals(results.length(), 1);
+		assertEquals((document.put("ID", "1")).toString(), results.getJSONObject(0).toString());
 		
 		TestDelete.deleteObject("Test", "1");
 	}
@@ -193,21 +224,20 @@ public class TestQuery {
 		HTTPConnection.excutePost(queryURL, parameters.toString());
 	}
 	
-	public static void testPlayers() throws JSONException, IOException {
-		JSONObject query = new JSONObject();
-		query.put("PlayerData.Reviews.Reviews.ItemReviewPlayerData.Phrase.Translation", "good morning");
-		System.out.println(query.toString());
-		
-		JSONArray filters = new JSONArray();
-		filters.put("PlayerData.PersonalData.Name");
+	@Test
+	public void testPlayers() throws JSONException, IOException {
+		JSONObject queryItem = new JSONObject();
+		queryItem.put("attribute", "ID");
+		queryItem.put("op", "EQ");
+		queryItem.put("values", new JSONArray().put("12345"));
 		
 		JSONObject parameters = new JSONObject();
-		parameters.append("query", query.toString());
-		parameters.append("collection", "TestInsert");
-		parameters.append("filters", filters.toString());
+		parameters.append("query", queryItem);
+		parameters.put("table", "Players");
 		System.out.println(parameters.toString());
 		
-		HTTPConnection.excutePost(queryURL, parameters.toString());
+		String results = HTTPConnection.excutePost(queryURL, parameters.toString());
+		System.out.println(results);
 	}
 
 	public static void testPlayers2() throws JSONException, IOException {
