@@ -1,90 +1,73 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-    <title>Hello AWS Web World!</title>
-    <link rel="stylesheet" href="styles/styles.css" type="text/css" media="screen">
-  </head>
-  <body>
-    <div id="content" class="container">
+<html hola_ext_inject="disabled"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title>Crystallize</title>
+  <script type="text/javascript" src="jquery-1.9.1.js"></script>
+  <script type="text/javascript" src="jquery-ui.js"></script>
+  <link rel="stylesheet" type="text/css" href="styles/jquery-ui.css">
+  <link rel="stylesheet" type="text/css" href="styles/result-light.css">
+  <script src="crystallize.js"></script>
+  <link rel="stylesheet" type="text/css" href="styles/crystallize.css">
+</head>
 
-      <div style="height: 10px;"> </div>
+<body background="StreetScreenShotFull.png" cz-shortcut-listen="true">
 
-      <h3>AWS Java Web Project</h3>
-      <p>
-      Welcome to your new AWS Java Web Project! This project template gives you
-      basic a starting point for creating a web application on AWS.
-      </p>
+    <div class="smallSpace"></div>
 
-      <h4>Contents of this Project</h4>
+    <h1 class="bottom-three">
+        Crystallize
+    </h1>
 
-      <p>
-      This page is rendered from <b>WebContent/index.html</b> - a simple static
-      HTML page. Any static content in the WebContent folder will be accessible
-      from the equivalent path in your web application (for example,
-      https://your-app-93s2kypa5y.elasticbeanstalk.com/index.html).
-      </p>
+    <div id="container">
+        <main id="center" class="column">
+            <article>
+                <div class="ui-widget">
+                    <h1 class="title">Dictionary Lookup</h1>
+                     <form autocomplete="off" onsubmit = "mysubmit()">
+                        <span class = "textbox">
+                            <label for="query">Enter Text:</label>
+                            <input id="query" size="50" class="ui-autocomplete-input" autocomplete="off">
+                            <input type = "submit" name = "submit" value = "Submit"/>
+                        </span>
+                    </form>
+                    </br>
+                    </br>
+                    </br>
+                    </br>
+                </div>
+                
+                <div id="about_us">
+                    <h1 class="title">About us</h1>
+                    <p>
+                        We are a research group led by Prof. Erik Andersen at Cornell University studying second-language learning in video games. We developed Crystallize to make second-language learning approachable and engaging. We plan to use the data we collect from the game to help us better understand language learning and better help you learn a second language.
+                    </p>
+                    <h3>
+                        The team
+                    </h3>
+                    <p>
+                        <em>Gabriel Culbertson</em> is a second-year PhD student in Information Science at Cornell. He spent nearly two years in China during his undergraduate program at Purdue where he developed a passion for second-language learning. He hopes to share his love of language learning and games through Crystallize.
+                    </p>
+                    <p>
+                        <em>Shiyu Wang</em> is a sophomore studying Computer Science at Cornell. He likes mathematics and programming, and especially enjoys developing cool games. He's worked on nearly all of the core systems that make Crystallize what it is, including content creation tools, data structures and networking.
+                    </p>
+                    <p>
+                        <em>Eileen Liu</em> is a senior studying Computer Science at Cornell. Both a programmer and an artist, she codes, paints, and makes games in her free time. She works on 3d art assets for new locations in Crystallize, as well as back-end services and networking for the game.
+                    </p>
+                    <p>
+                        <em>Alan Cheng</em> is a junior studying Computer Science at Cornell. He is interested in how games can be used to enrich people's lives, currently with a focus in investigating how to make education more engaging and effective through games.
+                    </p>
+                    <p>
+                        <em>Haoxuan Wu</em> is a junior studying Computer Science at Cornell. He is interested in data analysis and machine learning; he is currently working on networking and security for this project.
+                    </p>
+                    <p>
+                        <em>Prof. Erik Andersen</em> is the primary faculty advisor for the <em>Crystallize</em> project. He has studied Japanese for seven years and still cannot speak it very well. This motivated him to investigate new methods of language instruction that can be dramatically more engaging and effective. He led the team that created Refraction (Center for Game Science 2010), a video game for learning fractions that has been played one million times and won the Grand Prize in the Disney Learning Challenge at SIGGRAPH 2010 and the Best Work in the Primary School Category in the 2011 NHK Japan Prize. You can learn more about Prof. Andersen at his <a href="http://www.cs.cornell.edu/~eland/">website</a>.
+                    </p>
+                    <p>
+                        <em>Prof. Walker White</em> is the head of The Game Design Initiative at Cornell. He has been a key mentor throughout the project.
+                    </p>
+                    <p>
+                        If you have questions, you can contact Gabriel Culbertson.
+                    </p>
 
-      <p>
-      Any <a href="https://jsp.java.net/">JSP</a> files in the WebContent folder
-      will be processed dynamically to generate HTML pages. For example, the
-      <a href="index.jsp">index.jsp</a> file renders a simple page that displays
-      a list of any <a href="http://aws.amazon.com/s3/">Amazon S3</a> Buckets,
-      <a href="http://aws.amazon.com/dynamodb/">Amazon DynamoDB</a> Tables,
-      and <a href="http://aws.amazon.com/ec2/">Amazon EC2</a> Instances currently
-      associated with your AWS account.
-      </p>
-
-      <h4>Deploying this Project Locally</h4>
-
-      <p>
-      If you have a local installation of <a href="http://tomcat.apache.org/">
-      Apache Tomcat</a>, you can deploy this project to it for local testing
-      using the standard Eclipse Web Tools Platform integration with Tomcat.
-      </p>
-
-      <ul>
-        <li>Right/control click on this project in the Project Explorer</li>
-        <li>Choose Run As, then Run on Server</li>
-        <li>Select the option to manually define a new server</li>
-        <li>Expand the Apache folder, then select an appropriate version of Tomcat</li>
-        <li>Point Eclipse at your local Tomcat installation and click Finish</li>
-      </ul>
-
-      <p>
-      This page will open up, now served by your local Tomcat installation.
-      </p>
-
-      <h4>Deploying the Project to AWS Elastic Beanstalk</h4>
-
-      <p>
-      <a href="http://aws.amazon.com/elasticbeanstalk/">AWS Elastic Beanstalk</a>
-      is the quickest and easiest way to deploy an AWS Java Web Project to the
-      cloud. To deploy this project to AWS Elastic Beanstalk:
-      </p>
-
-      <ul>
-        <li>Right/control click on this project in the Project Explorer</li>
-        <li>Choose run As, then Run on Server</li>
-        <li>Select the option to manually define a new server</li>
-        <li>Expand the Amazon Web Services folder, then select an appropriate version of Tomcat</li>
-        <li>Select the AWS region where your application will be hosted</li>
-        <li>Provide a name for your application and environment and click Finish</li>
-      </ul>
-
-      <p>
-      Your project will be uploaded to AWS Elastic Beanstalk, which will
-      provision infrastructure to host your application and deploy your code
-      to it. When it's finished, you will again see this page open up, now hosted
-      in the cloud!
-      </p>
-
-      <p>
-      For more information about working with AWS Elastic Beanstalk, refer to the
-      <a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create_deploy_Java.html">
-      AWS Elastic Beanstalk Developer Guide</a>.
-      </p>
-
-    </div>
-  </body>
+</body>
 </html>

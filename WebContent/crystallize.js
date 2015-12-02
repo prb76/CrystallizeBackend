@@ -52,7 +52,7 @@ function getJapaneseWords(query) {
     $.ajax({
         type: "POST",
         url: "http://localhost:8080/CrystallizeDynamoBackend/Query",
-        data: request,
+        data: JSON.stringify(request),
         dataType: 'json',
         contentType: 'application/json',
         crossDomain: true,
