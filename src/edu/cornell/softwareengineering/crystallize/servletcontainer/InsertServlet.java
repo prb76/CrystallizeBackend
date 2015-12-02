@@ -30,7 +30,7 @@ public class InsertServlet extends HttpServlet {
 		try {
 			parameters = ParameterParser.getParameterObject(request);
 			JSONObject refinedParams = refineParameters(parameters);
-			String result = Insert.upsert(refinedParams);	
+			String result = Insert.upsert(refinedParams);
 			out.append(result);
 			
 		} catch (Exception e) {

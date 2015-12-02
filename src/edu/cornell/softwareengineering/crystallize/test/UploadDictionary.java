@@ -2,6 +2,7 @@ package edu.cornell.softwareengineering.crystallize.test;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -35,9 +36,17 @@ public class UploadDictionary {
 //    	System.out.println("Read file = "+s);
     	return s;
     }
-	
+	public static void writeFile(String path, byte[] data) throws IOException 
+    {
+    	FileOutputStream stream = new FileOutputStream(path);
+    	try {
+    	    stream.write(data);
+    	} finally {
+    	    stream.close();
+    	}
+    }
 	public static void uploadDictionary(int entriesCount) throws JSONException, IOException {
-		String filename = "./data/JMdict_e.json";
+		String filename = "./data/JMdict_e.xml";
 		try {
 		    JSONObject obj = XML.toJSONObject(readFile(filename, StandardCharsets.UTF_8));
 
@@ -89,69 +98,6 @@ public class UploadDictionary {
         	e.printStackTrace(); 
         }
 	}	
-	
-//	public static String insertDictionary(JSONObject parameters) throws Exception {
-//		String tableName;
-//		String ID;
-//		JSONObject document;
-//		try {
-//			tableName = parameters.getString("table");
-//			document = parameters.getJSONObject("document");
-//			ID = parameters.getString("WordID");
-//		} catch (JSONException e) {
-//			throw new Exception("Parameter error inside Insert class");
-//		}
-//		
-//		Item item = new Item().withPrimaryKey("WordID", ID);
-//		
-//		JSONArray keys = document.names();
-//		for(int i = 0; i < keys.length(); i++) {
-//			String key = keys.getString(i);
-//			if(key.equals("English")) {
-//				Object value = JSONObject.wrap(document.get(key));
-//				if(value instanceof String) item.withString("English", (String) value);
-//				else item.withNull("English");
-//			}
-//			else if(key.equals("Kana")) {
-//				Object value = JSONObject.wrap(document.get(key));
-//				List<Map<String, String>> kanaObjects = new ArrayList<Map<String, String>>();
-//				
-//				if(value instanceof JSONArray) {
-//					JSONArray valueArray = (JSONArray) value;
-//					for(int j = 0; j < valueArray.length(); j++) {
-//						JSONObject newJSON = valueArray.getJSONObject(i);
-//						Map<String, String> newObj = new HashMap<String, String>();
-//						for(String name : JSONObject.getNames(newJSON)) {
-//							newObj.put(name, newJSON.getString(name));							
-//						}
-//						kanaObjects.add(newObj);
-//					}
-//				}
-//				else if(value instanceof JSONObject) { 
-//					JSONObject newJSON = (JSONObject) value;
-//					Map<String, String> newObj = new HashMap<String, String>();
-//					for(String name : JSONObject.getNames(newJSON)) {
-//						newObj.put(name, newJSON.getString(name));							
-//					}
-//					kanaObjects.add(newObj);
-//				}
-//				else { kanaObjects = null; }
-//				if(kanaObjects != null) item.withList("Kana", kanaObjects);
-//				else item.withNull("Kana");
-//			}
-//			else { item.withNull(key); }
-//		}
-//		
-//		Table table = DynamoDBClient.getTable(tableName);
-//		
-//		PutItemOutcome result = table.putItem(item);
-//		
-//		JSONObject resultJSON = new JSONObject();
-//		resultJSON.put("ok", true);
-//		resultJSON.put("results", result);
-//		
-//    	return resultJSON.toString();
-//	}
 	
 	/*
 	 *  Create string of English translations, separated into senses and different sense translations. 
@@ -235,15 +181,9 @@ public class UploadDictionary {
 			Map<String, String> newObj = new HashMap<String, String>();
 			for(String name : JSONObject.getNames(newJSON)) {
 				if(name.equals("reb")) newObj.put(name, newJSON.getString(name));
-				byte[] latin = newJSON.getString(name).getBytes();
-				try {
-					byte[] utf8 = new String(latin, "ISO-8859-1").getBytes("UTF-8");
-					System.out.println(new String(newJSON.getString(name).getBytes("UTF-8")));
-					System.out.println(new String(latin, "ISO-8859-1"));
-				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				//System.out.println(newJSON.getString(name));
+				byte[] bytes = newJSON.getString(name).getBytes(StandardCharsets.UTF_8);
+				System.out.println(new String(bytes));
 			}
 			kanaObjects.add(newObj);
 		}
