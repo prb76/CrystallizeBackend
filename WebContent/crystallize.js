@@ -37,42 +37,6 @@ function extractLast( term ) {
     return split( term ).pop();
 }
 
-function getJapaneseWords(query) {
-	var request = {};
-	request.table = "Dictionary";
-	
-	var queryJSON = {};
-	queryJSON.attribute = "English";
-	queryJSON.op = "CONTAINS";
-	queryJSON.values = [query];
-
-	request.query = [queryJSON];
-	console.log(request);
-	
-    $.ajax({
-        type: "POST",
-        url: "http://localhost:8080/CrystallizeDynamoBackend/Query",
-        data: request,
-        dataType: 'json',
-        contentType: 'application/json',
-        crossDomain: true,
-        success: function( res ) {
-              var msg = '{ "results" : [' +
-              '{ "ent_seq":1 , "jap":"Hello" },' +
-              '{ "ent_seq":2 , "jap":"Hell" },' +
-              '{ "ent_seq":3 , "jap":"Hi" } ]}';
-              var jsonObject = JSON.parse(msg);
-              var wordArray = new Array();
-              var wordObjectArray = jsonObject["results"];
-              for (i=0; i < wordObjectArray.length; i++) {
-                  wordObject = wordObjectArray[i];
-                  wordArray[i] = {label: wordObject["jap"], value: wordObject["ent_seq"]};
-              }
-              return wordArray;
-        }
-    	});
-  }
-
 $( "#query" )
     // don't navigate away from the field on tab when selecting an item
     .bind( "keydown", function( event ) {
@@ -85,11 +49,39 @@ $( "#query" )
     .autocomplete({
         minLength: 1,
         source: function( request, response ) {
+        	
             // delegate back to autocomplete, but extract the last term
-            // response( $.ui.autocomplete.filter(
-            //     availableTags, extractLast( request.term ) ) );
-            wordArray = getJapaneseWords(extractLast( request.term ));
-            response(wordArray);
+        	var query = extractLast( request.term );
+        	var requestData = {};
+        	requestData.table = "Dictionary";
+        	var queryJSON = {};
+        	queryJSON.attribute = "English";
+        	queryJSON.op = "CONTAINS";
+        	queryJSON.values = [query];
+
+        	requestData.query = [queryJSON];
+        	console.log(requestData);
+        	
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:8080/CrystallizeDynamoBackend/Query",
+                data: JSON.stringify(requestData),
+                dataType: 'json',
+                contentType: 'application/json',
+                crossDomain: true,
+                success: function( res ) {
+                      var wordArray = new Array();
+                      var wordObjectArray = res["results"];
+                      for (i=0; i < 11; i++) {
+                          wordObject = wordObjectArray[i];
+                          if (wordObject == undefined) {
+                        	  break;
+                          }
+                          wordArray[i] = {label: wordObject["Kana"]["l"][0]["m"]["reb"]["s"], value: wordObject["WordID"]["s"]};
+                      }
+                      response(wordArray);
+                }
+            	});
         },
         focus: function() {
             // prevent value inserted on focus
