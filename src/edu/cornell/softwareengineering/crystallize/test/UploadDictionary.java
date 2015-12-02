@@ -37,7 +37,7 @@ public class UploadDictionary {
     }
 	
 	public static void uploadDictionary(int entriesCount) throws JSONException, IOException {
-		String filename = "./data/JMdict_e.json";
+		String filename = "./data/JMdict_e.xml";
 		try {
 		    JSONObject obj = XML.toJSONObject(readFile(filename, StandardCharsets.UTF_8));
 
@@ -172,15 +172,9 @@ public class UploadDictionary {
 			Map<String, String> newObj = new HashMap<String, String>();
 			for(String name : JSONObject.getNames(newJSON)) {
 				if(name.equals("reb")) newObj.put(name, newJSON.getString(name));
-				byte[] latin = newJSON.getString(name).getBytes();
-				try {
-					byte[] utf8 = new String(latin, "ISO-8859-1").getBytes("UTF-8");
-					System.out.println(new String(newJSON.getString(name).getBytes("UTF-8")));
-					System.out.println(new String(latin, "ISO-8859-1"));
-				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				//System.out.println(newJSON.getString(name));
+				byte[] bytes = newJSON.getString(name).getBytes(StandardCharsets.UTF_8);
+				System.out.println(new String(bytes));
 			}
 			kanaObjects.add(newObj);
 		}
