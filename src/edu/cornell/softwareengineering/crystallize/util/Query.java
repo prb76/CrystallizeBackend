@@ -27,10 +27,18 @@ public class Query {
 		
 		try {
 			tableName = parameters.getString("table");
+		} catch (JSONException e) {
+			throw new Exception("Attribute 'table' is not a String as anticipated");
+		}
+		try {
 			query = parameters.getJSONArray("query");
+		} catch (JSONException e) {
+			throw new Exception("Attribute 'query' is not a Map as anticipated");
+		}
+		try {
 			filters = parameters.getJSONArray("filters");
 		} catch (JSONException e) {
-			throw new Exception("Parameter error inside Insert class");
+			throw new Exception("Attribute 'filters' is not a List as anticipated");
 		}
 		
 		AmazonDynamoDBClient dynamoDB = DynamoDBClient.getDynamoClient();

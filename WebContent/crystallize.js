@@ -77,8 +77,9 @@ $( "#query" )
                           if (wordObject == undefined) {
                         	  break;
                           }
-                          wordArray[i] = {label: wordObject["Kana"]["l"][0]["m"]["reb"]["s"], value: wordObject["WordID"]["s"]};
+                          wordArray[i] = {label: wordObject["Kana"][0]["reb"], value: wordObject["WordID"]};
                       }
+                      console.log(wordArray);
                       response(wordArray);
                 }
             	});

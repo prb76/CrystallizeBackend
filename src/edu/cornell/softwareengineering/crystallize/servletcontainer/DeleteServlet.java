@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import edu.cornell.softwareengineering.crystallize.util.Delete;
@@ -34,8 +35,14 @@ public class DeleteServlet extends HttpServlet {
 			out.append(result);
 			
 		} catch (Exception e) {
-			out.append(e.getMessage());
-			e.printStackTrace();
+			JSONObject failureJSON = new JSONObject();
+			try {
+				failureJSON.put("ok", false);
+				failureJSON.put("message", e.getMessage());
+			} catch (JSONException e1) {
+				out.append(e.getMessage());
+			}
+			out.append(failureJSON.toString());
 		}
 	}
 

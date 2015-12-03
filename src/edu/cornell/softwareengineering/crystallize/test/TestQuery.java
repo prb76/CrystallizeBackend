@@ -16,7 +16,7 @@ public class TestQuery {
 	
 	public JSONArray query(String table, JSONArray queryItems, JSONArray filters) throws JSONException, IOException {
 		JSONObject parameters = new JSONObject();
-		parameters.put("table", "Test");
+		parameters.put("table", table);
 		parameters.put("query", queryItems);
 		if(filters != null) parameters.put("filters", filters);
 		
@@ -202,6 +202,18 @@ public class TestQuery {
 		assertEquals((document.put("ID", "1")).toString(), results.getJSONObject(0).toString());
 		
 		TestDelete.deleteObject("Test", "1");
+	}
+	
+	@Test
+	public void testDictionary() throws JSONException, IOException {
+		// Query Item
+		JSONObject queryItem = new JSONObject();
+		queryItem.put("attribute", "English");
+		queryItem.put("op", "CONTAINS");
+		queryItem.put("values", new JSONArray().put("dance"));
+
+		JSONArray results = query("Dictionary", new JSONArray().put(queryItem), null);
+		System.out.println(results);
 	}
 	
 	public static void allFeatureTest() throws JSONException, IOException {

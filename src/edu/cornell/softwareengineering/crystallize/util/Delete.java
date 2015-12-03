@@ -14,9 +14,13 @@ public class Delete {
 		String ID;
 		try {
 			tableName = parameters.getString("table");
+		} catch (JSONException e) {
+			throw new Exception("Attribute 'table' is not a String as anticipated");
+		}
+		try {
 			ID = parameters.getString("ID");
 		} catch (JSONException e) {
-			throw new Exception("Parameter error inside Insert class");
+			throw new Exception("Attribute 'ID' is not a String as anticipated");
 		}
 		
 		Table table = DynamoDBClient.getTable(tableName);
